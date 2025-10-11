@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Food Pantry</title>
+    <!-- Use Spring Boot static path -->
+    <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+    <header>
+        <img src="/images/cougar_mock-up.png" alt="Logo for WSU">
+        <!-- Link through Spring Boot route -->
+        <h1 onclick="window.location.href='/'">Voiland Food Pantry</h1>
+    </header>
+
+    <div class="main-content">
+        <h2>Introduction to Services</h2>
+        <h3>Providing Free Food to All Students</h3>
+        <p>Dana 107</p>
+        <p>Drop off donations to the boxes in: Sloan 112, Dana 110, or Dana 15 (the fiz)</p>
+
+        <h2>Hours of Operation</h2>
+        <h3>Monday-Friday 3:00pm-5:00pm</h3>
+
+        <div>
+            <button onclick="window.location.href='/login'">Login</button>
+            <button onclick="window.location.href='/volunteer-form'">Volunteer Form</button>
+            <button onclick="window.location.href='/card-reader'">Card Reader Selection</button>
+        </div>
+    </div>
+
+    <footer>
+        Note: Generative AI was used in making this site. See "html_mock-up_prompt.txt" for the ChatGPT entry.
+    </footer>
+</body>
+</html>
