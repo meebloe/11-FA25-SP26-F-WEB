@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Inventory</title>
+    <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+<header>
+    <img src="/images/cougar_mock-up.png" alt="Logo for WSU">
+    <h1 onclick="window.location.href='/'">Voiland Food Pantry</h1>
+</header>
+
+<div class="main-content">
+    <h2>Pantry Inventory</h2>
+
+    <form method="get" action="/inventory" style="margin-bottom: 20px;">
+        <input type="text" name="search" placeholder="Search by product name" th:value="${search}">
+        <button type="submit">Search</button>
+        <button type="button" onclick="window.location.href='/inventory'">Clear</button>
+    </form>
+
+    <table border="1" style="margin: 0 auto;">
+        <tr>
+            <th>ID</th>
+            <th>UPC</th>
+            <th>Product Name</th>
+            <th>Net Weight (oz)</th>
+            <th>Quantity</th>
+            <th>Actions</th>
+        </tr>
+        <tr th:each="item : ${inventory}">
+            <td th:text="${item.id}"></td>
+            <td th:text="${item.upc}"></td>
+            <td th:text="${item.productName}"></td>
+            <td th:text="${item.netWeight}"></td>
+            <td th:text="${item.quantity}"></td>
+            <td>
+                <a th:href="@{'/inventory/delete/' + ${item.id}}">Delete</a>
+            </td>
+        </tr>
+    </table>
+
+    <h3 style="margin-top: 30px;">Add New Item</h3>
+    <form method="post" action="/inventory/add" style="display: inline-block; text-align: left;">
+        <label>UPC:</label><br>
+        <input type="text" name="upc" required><br>
+
+        <label>Product Name:</label><br>
+        <input type="text" name="productName" required><br>
+
+        <label>Net Weight (oz):</label><br>
+        <input type="number" name="netWeight" step="0.01" required><br>
+
+        <label>Quantity:</label><br>
+        <input type="number" name="quantity" required><br><br>
+
+        <button type="submit">Add Item</button>
+    </form>
+
+    <div style="margin-top: 20px;">
+        <button onclick="window.location.href='/'">Back to Home</button>
+    </div>
+</div>
+
+<footer>
+</footer>
+</body>
+</html>
