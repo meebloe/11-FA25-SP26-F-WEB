@@ -7,6 +7,11 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 
 @Controller
 public class InventoryController {
@@ -47,5 +52,76 @@ public class InventoryController {
         updatedItem.setId(id);
         inventoryRepository.save(updatedItem);
         return "redirect:/inventory";
+    }
+
+    // Checkout endpoint: accepts JSON { "code": "<UPC>" }
+    @PostMapping(path = "/inventory/checkout", consumes = "application/json", produces = "application/json")
+    @ResponseBody
+    public ResponseEntity<Map<String, Object>> checkout(@RequestBody Map<String, String> payload) {
+        String code = payload.get("code");
+        if (code == null || code.trim().isEmpty()) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(Map.of("status", "error", "message", "Missing code"));
+        }
+        Optional<Inventory> optional = inventoryRepository.findByUpc(code.trim());
+        if (optional.isEmpty()) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(Map.of("status", "not_found"));
+        }
+        Inventory item = optional.get();
+        if (item.getQuantity() <= 0) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(Map.of("status", "out_of_stock"));
+        }
+        item.setQuantity(item.getQuantity() - 1);
+        inventoryRepository.save(item);
+        return ResponseEntity.ok(Map.of(
+                "status", "ok",
+                "upc", item.getUpc(),
+                "productName", item.getProductName(),
+                "newQuantity", item.getQuantity()
+        ));
+    }
+
+    // Scan-in endpoint: accepts JSON { "code": "<UPC>", "productName": "..." (optional), "netWeight": 12.5 (optional) }
+    @PostMapping(path = "/inventory/scanin", consumes = "application/json", produces = "application/json")
+    @ResponseBody
+    public ResponseEntity<Map<String, Object>> scanIn(@RequestBody Map<String, Object> payload) {
+        String code = (payload.get("code") != null) ? payload.get("code").toString().trim() : null;
+        if (code == null || code.isEmpty()) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(Map.of("status", "error", "message", "Missing code"));
+        }
+        Optional<Inventory> optional = inventoryRepository.findByUpc(code);
+        if (optional.isPresent()) {
+            Inventory item = optional.get();
+            item.setQuantity(item.getQuantity() + 1);
+            inventoryRepository.save(item);
+            return ResponseEntity.ok(Map.of(
+                    "status", "ok",
+                    "upc", item.getUpc(),
+                    "productName", item.getProductName(),
+                    "newQuantity", item.getQuantity()
+            ));
+        }
+
+        // not found: check if payload contains productName and netWeight to create new record
+        Object nameObj = payload.get("productName");
+        Object netObj = payload.get("netWeight");
+        if (nameObj != null && netObj != null) {
+            String name = nameObj.toString();
+            double netWeight;
+            try {
+                netWeight = Double.parseDouble(netObj.toString());
+            } catch (NumberFormatException e) {
+                netWeight = 0.0;
+            }
+            Inventory newItem = new Inventory(code, name, netWeight, 1);
+            inventoryRepository.save(newItem);
+            return ResponseEntity.status(HttpStatus.CREATED).body(Map.of(
+                    "status", "created",
+                    "upc", newItem.getUpc(),
+                    "productName", newItem.getProductName(),
+                    "newQuantity", newItem.getQuantity()
+            ));
+        }
+
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(Map.of("status", "not_found"));
     }
 }

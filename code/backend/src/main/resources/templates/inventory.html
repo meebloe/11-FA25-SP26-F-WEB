@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Inventory</title>
     <link rel="stylesheet" href="/css/style.css">
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
 </head>
 <body>
 <header>
@@ -42,27 +43,295 @@
         </tr>
     </table>
 
-    <h3 style="margin-top: 30px;">Add New Item</h3>
-    <form method="post" action="/inventory/add" style="display: inline-block; text-align: left;">
-        <label>UPC:</label><br>
-        <input type="text" name="upc" required><br>
-
-        <label>Product Name:</label><br>
-        <input type="text" name="productName" required><br>
-
-        <label>Net Weight (oz):</label><br>
-        <input type="number" name="netWeight" step="0.01" required><br>
-
-        <label>Quantity:</label><br>
-        <input type="number" name="quantity" required><br><br>
-
-        <button type="submit">Add Item</button>
-    </form>
+    
+    <button type="button" onclick="openCheckoutPopup()" style="margin-left: 10px;">Checkout</button>
+    <button type="button" onclick="openScanInPopup()" style="margin-left: 10px;">Scan In</button>
 
     <div style="margin-top: 20px;">
         <button onclick="window.location.href='/'">Back to Home</button>
     </div>
 </div>
+
+<!-- Checkout Popup -->
+<div id="checkoutPopup" style="display: none; position: fixed; left: 50%; top: 50%; transform: translate(-50%, -50%); 
+    background-color: white; padding: 20px; border: 1px solid #ccc; box-shadow: 0 0 10px rgba(0,0,0,0.5); z-index: 1000;">
+    <h3>Checkout Item</h3>
+    <form id="checkoutForm" onsubmit="handleCheckout(event)">
+        <label>Product Code:</label><br>
+        <input type="text" id="productCode" required><br><br>
+        <button type="button" onclick="closeCheckoutPopup()">Cancel</button>
+    </form>
+</div>
+
+<!-- Scan In Popup -->
+<div id="scanInPopup" style="display: none; position: fixed; left: 50%; top: 50%; transform: translate(-50%, -50%); 
+    background-color: white; padding: 20px; border: 1px solid #ccc; box-shadow: 0 0 10px rgba(0,0,0,0.5); z-index: 1000;">
+    <h3>Scan In Item</h3>
+    <form id="scanInForm" onsubmit="handleScanIn(event)">
+        <label>Product Code:</label><br>
+        <input type="text" id="scanInCode" required><br><br>
+
+        <div id="scanInDetails" style="display:none; margin-top:10px;">
+            <p>No existing item found — create new item:</p>
+            <label>Product Name:</label><br>
+            <input type="text" id="scanInProductName" required><br>
+            <label>Net Weight (oz):</label><br>
+            <input type="number" id="scanInNetWeight" step="0.01" required><br><br>
+        </div>
+
+        <button type="submit">Submit</button>
+        <button type="button" onclick="closeScanInPopup()">Cancel</button>
+    </form>
+</div>
+
+<script>
+function openCheckoutPopup() {
+    const popup = document.getElementById('checkoutPopup');
+    const input = document.getElementById('productCode');
+    popup.style.display = 'block';
+    // Focus and select the input so barcode scanners or quick typing will go straight into it
+    input.focus();
+    input.select();
+    // clear any pending debounce timer
+    if (window.checkoutDebounce) {
+        clearTimeout(window.checkoutDebounce);
+        window.checkoutDebounce = null;
+    }
+}
+
+function closeCheckoutPopup() {
+    document.getElementById('checkoutPopup').style.display = 'none';
+    document.getElementById('productCode').value = '';
+    if (window.checkoutDebounce) {
+        clearTimeout(window.checkoutDebounce);
+        window.checkoutDebounce = null;
+    }
+}
+
+function submitCheckout() {
+    const productCode = document.getElementById('productCode').value.trim();
+    if (!productCode) return;
+    // call backend endpoint to process checkout
+    fetch('/inventory/checkout', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ code: productCode })
+    })
+    .then(async resp => {
+        if (resp.ok) {
+            const data = await resp.json();
+            // update quantity in the visible table if present
+            const rows = document.querySelectorAll('table tr');
+            for (let i = 1; i < rows.length; i++) {
+                const cells = rows[i].children;
+                if (!cells || cells.length < 5) continue;
+                const upcCell = cells[1].textContent.trim();
+                if (upcCell === productCode) {
+                    // quantity is column index 4 (0-based)
+                    const qtyCell = cells[4];
+                    qtyCell.textContent = data.newQuantity;
+                    break;
+                }
+            }
+            closeCheckoutPopup();
+        } else {
+            const err = await resp.json().catch(() => null);
+            const message = err?.message || (err?.status ? err.status : 'Error during checkout');
+            alert('Checkout failed: ' + message);
+        }
+    })
+    .catch(e => {
+        console.error('Checkout request failed', e);
+        alert('Checkout request failed');
+    });
+}
+
+// Support the form submit (Enter key when the form is focused)
+function handleCheckout(event) {
+    event && event.preventDefault();
+    submitCheckout();
+}
+
+// Add listeners when DOM is ready: submit on Enter, and auto-submit after short pause (debounce)
+document.addEventListener('DOMContentLoaded', function () {
+    const input = document.getElementById('productCode');
+    if (!input) return;
+
+    // Submit immediately on Enter
+    input.addEventListener('keydown', function (e) {
+        if (e.key === 'Enter') {
+            e.preventDefault();
+            submitCheckout();
+        }
+    });
+
+    // Auto-submit after a short pause (useful for barcode scanners that paste quickly)
+    input.addEventListener('input', function () {
+        if (window.checkoutDebounce) clearTimeout(window.checkoutDebounce);
+        if (!this.value) return;
+        // if input stops changing for 250ms, submit
+        window.checkoutDebounce = setTimeout(submitCheckout, 250);
+    });
+});
+
+// --- Scan In logic ---
+function openScanInPopup() {
+    const popup = document.getElementById('scanInPopup');
+    const input = document.getElementById('scanInCode');
+    const details = document.getElementById('scanInDetails');
+    popup.style.display = 'block';
+    details.style.display = 'none';
+    document.getElementById('scanInProductName').value = '';
+    document.getElementById('scanInNetWeight').value = '';
+    input.focus();
+    input.select();
+    if (window.scanInDebounce) {
+        clearTimeout(window.scanInDebounce);
+        window.scanInDebounce = null;
+    }
+}
+
+function closeScanInPopup() {
+    document.getElementById('scanInPopup').style.display = 'none';
+    document.getElementById('scanInCode').value = '';
+    document.getElementById('scanInProductName').value = '';
+    document.getElementById('scanInNetWeight').value = '';
+    if (window.scanInDebounce) {
+        clearTimeout(window.scanInDebounce);
+        window.scanInDebounce = null;
+    }
+}
+
+function submitScanIn() {
+    const codeInput = document.getElementById('scanInCode');
+    const code = codeInput.value.trim();
+    if (!code) return;
+    // initial attempt: try to increment existing item
+    fetch('/inventory/scanin', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ code: code })
+    })
+    .then(async resp => {
+        if (resp.ok) {
+            const data = await resp.json();
+            // updated existing item
+            const rows = document.querySelectorAll('table tr');
+            for (let i = 1; i < rows.length; i++) {
+                const cells = rows[i].children;
+                if (!cells || cells.length < 5) continue;
+                const upcCell = cells[1].textContent.trim();
+                if (upcCell === code) {
+                    const qtyCell = cells[4];
+                    qtyCell.textContent = data.newQuantity;
+                    break;
+                }
+            }
+            closeScanInPopup();
+        } else if (resp.status === 404) {
+            // Item not found locally - check UPC database
+            var settings = {
+                "url": "https://api.upcdatabase.org/product/" + code,
+                "method": "GET",
+                "timeout": 0,
+                "headers": {
+                    "Authorization": "voilandPantry 5DB3738474976B9AFEBA64FB9BAD6440"
+                },
+            };
+            
+            $.ajax(settings)
+                .done(function (response) {
+                    // Pre-fill form with API data if available
+                    if (response && response.success === "true") {
+                        // Set product name from title
+                        $('#scanInProductName').val(response.title);
+                        
+                        // Set weight from metadata if available
+                        if (response.metadata && response.metadata.weight) {
+                            const weight = parseFloat(response.metadata.weight);
+                            if (!isNaN(weight)) {
+                                $('#scanInNetWeight').val(weight);
+                            }
+                        }
+                    }
+                    // Show the form even if API call succeeded (let user verify/edit details)
+                    document.getElementById('scanInDetails').style.display = 'block';
+                    setTimeout(() => document.getElementById('scanInProductName').focus(), 50);
+                })
+                .fail(function(jqXHR, textStatus, errorThrown) {
+                    console.log("UPC lookup failed:", textStatus, errorThrown);
+                    // Show empty form if API call fails
+                    document.getElementById('scanInDetails').style.display = 'block';
+                    setTimeout(() => document.getElementById('scanInProductName').focus(), 50);
+                });
+        } else if (resp.status === 201) {
+            // created (some servers might return 201 with Location) — reload to show new row
+            window.location.reload();
+        } else {
+            const err = await resp.json().catch(() => null);
+            const message = err?.message || (err?.status ? err.status : 'Error during scan in');
+            alert('Scan In failed: ' + message);
+        }
+    })
+    .catch(e => {
+        console.error('Scan In request failed', e);
+        alert('Scan In request failed');
+    });
+}
+
+function handleScanIn(event) {
+    event && event.preventDefault();
+    const detailsVisible = document.getElementById('scanInDetails').style.display !== 'none';
+    const code = document.getElementById('scanInCode').value.trim();
+    if (!code) return;
+    if (detailsVisible) {
+        // user filled name & netWeight — send creation request
+        const name = document.getElementById('scanInProductName').value.trim();
+        const netWeight = document.getElementById('scanInNetWeight').value;
+        if (!name) { alert('Please enter product name'); return; }
+        if (!netWeight) { alert('Please enter net weight'); return; }
+        fetch('/inventory/scanin', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ code: code, productName: name, netWeight: parseFloat(netWeight) })
+        })
+        .then(async resp => {
+            if (resp.status === 201 || resp.ok) {
+                // reload to show new item (simpler than dynamically inserting row)
+                window.location.reload();
+            } else {
+                const err = await resp.json().catch(() => null);
+                alert('Create failed: ' + (err?.message || JSON.stringify(err)));
+            }
+        })
+        .catch(e => { console.error(e); alert('Create request failed'); });
+    } else {
+        // first attempt: try to increment existing item
+        submitScanIn();
+    }
+}
+
+// Add listeners for scanIn when DOM is ready
+document.addEventListener('DOMContentLoaded', function () {
+    const input = document.getElementById('scanInCode');
+    if (!input) return;
+
+    // Enter submits
+    input.addEventListener('keydown', function (e) {
+        if (e.key === 'Enter') {
+            e.preventDefault();
+            submitScanIn();
+        }
+    });
+
+    // debounce auto-submit
+    input.addEventListener('input', function () {
+        if (window.scanInDebounce) clearTimeout(window.scanInDebounce);
+        if (!this.value) return;
+        window.scanInDebounce = setTimeout(submitScanIn, 250);
+    });
+});
+</script>
 
 <footer>
 </footer>
