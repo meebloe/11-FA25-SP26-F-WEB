@@ -16,6 +16,17 @@
 <div class="main-content">
     <h2>Pantry Inventory</h2>
 
+    <!-- Stats Box -->
+    <div style="position: fixed; right: 20px; top: 100px; padding: 20px; border: 1px solid #ccc; border-radius: 5px; background: white; min-width: 200px;">
+        <div style="margin-bottom: 20px;">
+            <label>Total Weight of Food Given Out:</label><br>
+            <div style="font-size: 24px; margin-top: 5px;">
+                <span id="totalWeight">0</span> oz
+            </div>
+        </div>
+        <button onclick="clearCheckouts()" style="width: 100%; padding: 10px;">Clear Checkouts</button>
+    </div>
+
     <form method="get" action="/inventory" style="margin-bottom: 20px;">
         <input type="text" name="search" placeholder="Search by product name" th:value="${search}">
         <button type="submit">Search</button>
@@ -134,6 +145,8 @@ function submitCheckout() {
                 }
             }
             closeCheckoutPopup();
+            // Update total weight after successful checkout
+            updateTotalWeight();
         } else {
             const err = await resp.json().catch(() => null);
             const message = err?.message || (err?.status ? err.status : 'Error during checkout');
@@ -153,7 +166,40 @@ function handleCheckout(event) {
 }
 
 // Add listeners when DOM is ready: submit on Enter, and auto-submit after short pause (debounce)
+// Function to update the total weight display
+function updateTotalWeight() {
+    fetch('/api/checkouts/weight-total')
+        .then(response => response.json())
+        .then(data => {
+            document.getElementById('totalWeight').textContent = data.totalWeight.toFixed(2);
+        })
+        .catch(error => {
+            console.error('Error fetching total weight:', error);
+        });
+}
+
+// Function to clear all checkouts
+function clearCheckouts() {
+    if (!confirm('Are you sure you want to clear all checkout records?')) return;
+    
+    fetch('/api/checkouts/clear', {
+        method: 'DELETE'
+    })
+        .then(response => response.json())
+        .then(data => {
+            updateTotalWeight(); // Reset the weight display
+            alert('All checkouts have been cleared');
+        })
+        .catch(error => {
+            console.error('Error clearing checkouts:', error);
+            alert('Failed to clear checkouts');
+        });
+}
+
 document.addEventListener('DOMContentLoaded', function () {
+    // Initial load of total weight
+    updateTotalWeight();
+    
     const input = document.getElementById('productCode');
     if (!input) return;
 

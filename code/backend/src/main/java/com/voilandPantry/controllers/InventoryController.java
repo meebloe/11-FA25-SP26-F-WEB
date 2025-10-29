@@ -1,7 +1,9 @@
 package com.voilandPantry.controllers;
 
 import com.voilandPantry.models.Inventory;
+import com.voilandPantry.models.Checkout;
 import com.voilandPantry.repositories.InventoryRepository;
+import com.voilandPantry.repositories.CheckoutRepository;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
@@ -17,9 +19,11 @@ import org.springframework.http.ResponseEntity;
 public class InventoryController {
 
     private final InventoryRepository inventoryRepository;
+    private final CheckoutRepository checkoutRepository;
 
-    public InventoryController(InventoryRepository inventoryRepository) {
+    public InventoryController(InventoryRepository inventoryRepository, CheckoutRepository checkoutRepository) {
         this.inventoryRepository = inventoryRepository;
+        this.checkoutRepository = checkoutRepository;
     }
 
     @GetMapping("/inventory")
@@ -72,11 +76,18 @@ public class InventoryController {
         }
         item.setQuantity(item.getQuantity() - 1);
         inventoryRepository.save(item);
+        
+        // Create checkout record
+        Long studentId = payload.containsKey("studentId") ? Long.parseLong(payload.get("studentId")) : 1L; // Default to ID 1 if not provided
+        Checkout checkout = new Checkout(studentId, item.getId());
+        checkoutRepository.save(checkout);
+
         return ResponseEntity.ok(Map.of(
                 "status", "ok",
                 "upc", item.getUpc(),
                 "productName", item.getProductName(),
-                "newQuantity", item.getQuantity()
+                "newQuantity", item.getQuantity(),
+                "checkoutId", checkout.getId()
         ));
     }
 
