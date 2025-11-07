@@ -5,110 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Inventory</title>
     <link rel="stylesheet" href="/css/style.css">
-    <style>
-        /* Inventory Page Specific Styles */
-        .main-content {
-            display: flex;
-            flex-direction: column;
-            align-items: stretch;
-            padding: 400px 40px 40px 40px; /* top padding to clear header/logo */
-            gap: 30px;
-        }
-
-        h2 {
-            text-align: center;
-            margin-bottom: 20px;
-            font-size: 2em;
-        }
-
-        /* Inventory Toolbar */
-        .inventory-toolbar {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 10px;
-            justify-content: center;
-            margin-bottom: 20px;
-        }
-
-        .inventory-toolbar input[type="text"] {
-            padding: 8px;
-            border-radius: 5px;
-            border: 1px solid #ccc;
-            width: 220px;
-        }
-
-        .inventory-toolbar button {
-            padding: 10px 20px;
-            font-size: 0.95em;
-            border-radius: 5px;
-        }
-
-        /* Table */
-        .inventory-table {
-            width: 100%;
-            border-collapse: collapse;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-            margin-bottom: 30px;
-        }
-
-        .inventory-table th, .inventory-table td {
-            padding: 12px 15px;
-            border-bottom: 1px solid #ddd;
-            text-align: left;
-        }
-
-        .inventory-table th {
-            background-color: #f4f4f4;
-        }
-
-        .inventory-table tr:hover {
-            background-color: #f9f9f9;
-        }
-
-        /* Delete button */
-        .delete-btn {
-            background-color: #A60F2D;
-            color: white;
-            border-radius: 20px;
-            padding: 6px 12px;
-            text-decoration: none;
-            font-size: 0.9em;
-        }
-
-        .delete-btn:hover {
-            background-color: #CA1237;
-        }
-
-        /* Add Item Form */
-        .form-add {
-            display: flex;
-            flex-direction: column;
-            gap: 12px;
-            max-width: 400px;
-            margin: 0 auto 30px auto;
-        }
-
-        .form-add label {
-            font-weight: bold;
-        }
-
-        .form-add input {
-            padding: 8px;
-            border-radius: 5px;
-            border: 1px solid #ccc;
-            width: 100%;
-        }
-
-        .form-add button {
-            align-self: center;
-            width: 150px;
-        }
-
-        /* Back button */
-        .back-btn-wrapper {
-            text-align: center;
-        }
-    </style>
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
 </head>
 <body>
 <header>
@@ -149,23 +46,187 @@
         </tr>
     </table>
 
-    <h3 style="text-align: center;">Add New Item</h3>
-    <form method="post" action="/inventory/add" class="form-add">
-        <label>UPC:</label>
-        <input type="text" name="upc" required>
-        <label>Product Name:</label>
-        <input type="text" name="productName" required>
-        <label>Net Weight (oz):</label>
-        <input type="number" name="netWeight" step="0.01" required>
-        <label>Quantity:</label>
-        <input type="number" name="quantity" required>
-        <button type="submit">Add Item</button>
-    </form>
+    <button type="button" onclick="openCheckoutPopup()" style="margin-left: 10px;">Checkout</button>
+    <button type="button" onclick="openScanInPopup()" style="margin-left: 10px;">Scan In</button>
 
     <div class="back-btn-wrapper">
         <button onclick="window.location.href='/'">Back to Home</button>
     </div>
 </div>
 
+<!-- Checkout Popup -->
+<div id="checkoutPopup" style="display: none; position: fixed; left: 50%; top: 50%; transform: translate(-50%, -50%); 
+    background-color: white; padding: 20px; border: 1px solid #ccc; box-shadow: 0 0 10px rgba(0,0,0,0.5); z-index: 1000;">
+    <h3>Checkout Item</h3>
+    <form id="checkoutForm" onsubmit="handleCheckout(event)">
+        <label>Product Code:</label><br>
+        <input type="text" id="productCode" required><br><br>
+        <button type="button" onclick="closeCheckoutPopup()">Cancel</button>
+    </form>
+</div>
+
+<!-- Scan In Popup -->
+<div id="scanInPopup" style="display: none; position: fixed; left: 50%; top: 50%; transform: translate(-50%, -50%); 
+    background-color: white; padding: 20px; border: 1px solid #ccc; box-shadow: 0 0 10px rgba(0,0,0,0.5); z-index: 1000;">
+    <h3>Scan In Item</h3>
+    <form id="scanInForm" onsubmit="handleScanIn(event)">
+        <label>Product Code:</label><br>
+        <input type="text" id="scanInCode" required><br><br>
+
+        <div id="scanInDetails" style="display:none; margin-top:10px;">
+            <p>No existing item found — create new item:</p>
+            <label>Product Name:</label><br>
+            <input type="text" id="scanInProductName" required><br>
+            <label>Net Weight (oz):</label><br>
+            <input type="number" id="scanInNetWeight" step="0.01" required><br><br>
+        </div>
+
+        <button type="submit">Submit</button>
+        <button type="button" onclick="closeScanInPopup()">Cancel</button>
+    </form>
+</div>
+
+<script>
+/* --- Checkout Functions --- */
+function openCheckoutPopup() {
+    const popup = document.getElementById('checkoutPopup');
+    const input = document.getElementById('productCode');
+    popup.style.display = 'block';
+    input.focus();
+    input.select();
+    if (window.checkoutDebounce) clearTimeout(window.checkoutDebounce);
+}
+
+function closeCheckoutPopup() {
+    document.getElementById('checkoutPopup').style.display = 'none';
+    document.getElementById('productCode').value = '';
+    if (window.checkoutDebounce) clearTimeout(window.checkoutDebounce);
+}
+
+function submitCheckout() {
+    const code = document.getElementById('productCode').value.trim();
+    if (!code) return;
+    fetch('/inventory/checkout', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ code })
+    })
+    .then(async resp => {
+        if (resp.ok) {
+            const data = await resp.json();
+            document.querySelectorAll('table tr').forEach((row, i) => {
+                if (i === 0) return;
+                const cells = row.children;
+                if (cells[1].textContent.trim() === code) {
+                    cells[4].textContent = data.newQuantity;
+                }
+            });
+            closeCheckoutPopup();
+        } else {
+            const err = await resp.json().catch(() => null);
+            alert('Checkout failed: ' + (err?.message || 'Unknown error'));
+        }
+    }).catch(e => alert('Checkout request failed'));
+}
+
+function handleCheckout(e) {
+    e.preventDefault();
+    submitCheckout();
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+    const input = document.getElementById('productCode');
+    if (!input) return;
+    input.addEventListener('keydown', e => { if(e.key==='Enter'){ e.preventDefault(); submitCheckout(); }});
+    input.addEventListener('input', function() {
+        if (window.checkoutDebounce) clearTimeout(window.checkoutDebounce);
+        if (!this.value) return;
+        window.checkoutDebounce = setTimeout(submitCheckout, 250);
+    });
+});
+
+/* --- Scan In Functions --- */
+function openScanInPopup() {
+    const popup = document.getElementById('scanInPopup');
+    const input = document.getElementById('scanInCode');
+    const details = document.getElementById('scanInDetails');
+    popup.style.display = 'block';
+    details.style.display = 'none';
+    document.getElementById('scanInProductName').value = '';
+    document.getElementById('scanInNetWeight').value = '';
+    input.focus();
+    input.select();
+    if (window.scanInDebounce) clearTimeout(window.scanInDebounce);
+}
+
+function closeScanInPopup() {
+    document.getElementById('scanInPopup').style.display = 'none';
+    document.getElementById('scanInCode').value = '';
+    document.getElementById('scanInProductName').value = '';
+    document.getElementById('scanInNetWeight').value = '';
+    if (window.scanInDebounce) clearTimeout(window.scanInDebounce);
+}
+
+function submitScanIn() {
+    const code = document.getElementById('scanInCode').value.trim();
+    if (!code) return;
+
+    fetch('/inventory/scanin', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ code })
+    })
+    .then(async resp => {
+        if (resp.ok) {
+            const data = await resp.json();
+            document.querySelectorAll('table tr').forEach((row, i) => {
+                if(i===0) return;
+                const cells = row.children;
+                if(cells[1].textContent.trim() === code) cells[4].textContent = data.newQuantity;
+            });
+            closeScanInPopup();
+        } else if (resp.status===404) {
+            document.getElementById('scanInDetails').style.display='block';
+            setTimeout(() => document.getElementById('scanInProductName').focus(), 50);
+        } else {
+            const err = await resp.json().catch(()=>null);
+            alert('Scan In failed: ' + (err?.message || 'Unknown error'));
+        }
+    })
+    .catch(e=>alert('Scan In request failed'));
+}
+
+function handleScanIn(e) {
+    e.preventDefault();
+    const detailsVisible = document.getElementById('scanInDetails').style.display !== 'none';
+    if(detailsVisible){
+        const name = document.getElementById('scanInProductName').value.trim();
+        const netWeight = document.getElementById('scanInNetWeight').value;
+        if(!name){ alert('Enter product name'); return; }
+        if(!netWeight){ alert('Enter net weight'); return; }
+        const code = document.getElementById('scanInCode').value.trim();
+        fetch('/inventory/scanin', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ code, productName: name, netWeight: parseFloat(netWeight) })
+        })
+        .then(async resp => { if(resp.ok||resp.status===201) window.location.reload(); })
+        .catch(e=>alert('Create request failed'));
+    } else submitScanIn();
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+    const input = document.getElementById('scanInCode');
+    if(!input) return;
+    input.addEventListener('keydown', e => { if(e.key==='Enter'){ e.preventDefault(); submitScanIn(); }});
+    input.addEventListener('input', function(){
+        if(window.scanInDebounce) clearTimeout(window.scanInDebounce);
+        if(!this.value) return;
+        window.scanInDebounce = setTimeout(submitScanIn, 250);
+    });
+});
+</script>
+
+<footer></footer>
 </body>
 </html>
