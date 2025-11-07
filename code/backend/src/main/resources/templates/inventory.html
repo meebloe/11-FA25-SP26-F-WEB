@@ -5,6 +5,110 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Inventory</title>
     <link rel="stylesheet" href="/css/style.css">
+    <style>
+        /* Inventory Page Specific Styles */
+        .main-content {
+            display: flex;
+            flex-direction: column;
+            align-items: stretch;
+            padding: 400px 40px 40px 40px; /* top padding to clear header/logo */
+            gap: 30px;
+        }
+
+        h2 {
+            text-align: center;
+            margin-bottom: 20px;
+            font-size: 2em;
+        }
+
+        /* Inventory Toolbar */
+        .inventory-toolbar {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            justify-content: center;
+            margin-bottom: 20px;
+        }
+
+        .inventory-toolbar input[type="text"] {
+            padding: 8px;
+            border-radius: 5px;
+            border: 1px solid #ccc;
+            width: 220px;
+        }
+
+        .inventory-toolbar button {
+            padding: 10px 20px;
+            font-size: 0.95em;
+            border-radius: 5px;
+        }
+
+        /* Table */
+        .inventory-table {
+            width: 100%;
+            border-collapse: collapse;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            margin-bottom: 30px;
+        }
+
+        .inventory-table th, .inventory-table td {
+            padding: 12px 15px;
+            border-bottom: 1px solid #ddd;
+            text-align: left;
+        }
+
+        .inventory-table th {
+            background-color: #f4f4f4;
+        }
+
+        .inventory-table tr:hover {
+            background-color: #f9f9f9;
+        }
+
+        /* Delete button */
+        .delete-btn {
+            background-color: #A60F2D;
+            color: white;
+            border-radius: 20px;
+            padding: 6px 12px;
+            text-decoration: none;
+            font-size: 0.9em;
+        }
+
+        .delete-btn:hover {
+            background-color: #CA1237;
+        }
+
+        /* Add Item Form */
+        .form-add {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            max-width: 400px;
+            margin: 0 auto 30px auto;
+        }
+
+        .form-add label {
+            font-weight: bold;
+        }
+
+        .form-add input {
+            padding: 8px;
+            border-radius: 5px;
+            border: 1px solid #ccc;
+            width: 100%;
+        }
+
+        .form-add button {
+            align-self: center;
+            width: 150px;
+        }
+
+        /* Back button */
+        .back-btn-wrapper {
+            text-align: center;
+        }
+    </style>
 </head>
 <body>
 <header>
@@ -15,13 +119,16 @@
 <div class="main-content">
     <h2>Pantry Inventory</h2>
 
-    <form method="get" action="/inventory" style="margin-bottom: 20px;">
-        <input type="text" name="search" placeholder="Search by product name" th:value="${search}">
-        <button type="submit">Search</button>
-        <button type="button" onclick="window.location.href='/inventory'">Clear</button>
-    </form>
+    <div class="inventory-toolbar">
+        <form method="get" action="/inventory" style="display:flex; gap:10px; flex-wrap: wrap;">
+            <input type="text" name="search" placeholder="Search by product name" th:value="${search}">
+            <button type="submit">Search</button>
+            <button type="button" onclick="window.location.href='/inventory'">Clear</button>
+            <button type="button" onclick="window.location.href='/inventory'">View All</button>
+        </form>
+    </div>
 
-    <table border="1" style="margin: 0 auto;">
+    <table class="inventory-table">
         <tr>
             <th>ID</th>
             <th>UPC</th>
@@ -37,34 +144,28 @@
             <td th:text="${item.netWeight}"></td>
             <td th:text="${item.quantity}"></td>
             <td>
-                <a th:href="@{'/inventory/delete/' + ${item.id}}">Delete</a>
+                <a th:href="@{'/inventory/delete/' + ${item.id}}" class="delete-btn">Delete</a>
             </td>
         </tr>
     </table>
 
-    <h3 style="margin-top: 30px;">Add New Item</h3>
-    <form method="post" action="/inventory/add" style="display: inline-block; text-align: left;">
-        <label>UPC:</label><br>
-        <input type="text" name="upc" required><br>
-
-        <label>Product Name:</label><br>
-        <input type="text" name="productName" required><br>
-
-        <label>Net Weight (oz):</label><br>
-        <input type="number" name="netWeight" step="0.01" required><br>
-
-        <label>Quantity:</label><br>
-        <input type="number" name="quantity" required><br><br>
-
+    <h3 style="text-align: center;">Add New Item</h3>
+    <form method="post" action="/inventory/add" class="form-add">
+        <label>UPC:</label>
+        <input type="text" name="upc" required>
+        <label>Product Name:</label>
+        <input type="text" name="productName" required>
+        <label>Net Weight (oz):</label>
+        <input type="number" name="netWeight" step="0.01" required>
+        <label>Quantity:</label>
+        <input type="number" name="quantity" required>
         <button type="submit">Add Item</button>
     </form>
 
-    <div style="margin-top: 20px;">
+    <div class="back-btn-wrapper">
         <button onclick="window.location.href='/'">Back to Home</button>
     </div>
 </div>
 
-<footer>
-</footer>
 </body>
 </html>

@@ -3,35 +3,28 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Login - Food Pantry</title>
+    <title>Student Sign-In - Food Pantry</title>
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
-    <header>
-        <img src="cougar_mock-up.png" alt="Logo for WSU">
-        <h1 onclick="window.location.href='index.html'">Voiland Food Pantry</h1>
-    </header>
+<header>
+    <h1>Voiland Food Pantry</h1>
+</header>
 
-    <div class="main-content">
-        <form>
-            <div>
-                <label for="username">Username or Email:</label>
-                <input type="text" id="username" name="username">
-            </div>
-            <div>
-                <label for="password">Password</label>
-                <input type="password" id="password" name="password">
-            </div>
-        </form>
+<div class="main-content">
+    <h2>Student Sign-In</h2>
+    <form method="POST" action="/login">
         <div>
-            <button onclick="window.location.href='login.html'">Login</button>
-            <button>Cancel</button>
+            <label for="firstName">First Name:</label>
+            <input type="text" id="firstName" name="firstName" required>
         </div>
+        <div>
+            <label for="lastName">Last Name:</label>
+            <input type="text" id="lastName" name="lastName" required>
+        </div>
+        <button type="submit">Sign In</button>
+    </form>
+</div>
 
-    </div>
-
-    <footer>
-        Note: Generative AI was used in making this site. See "html_mock-up_prompt.txt" for the ChatGPT entry.
-    </footer>
 </body>
 </html>
