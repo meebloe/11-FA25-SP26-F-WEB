@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Register Student</title>
+</head>
+<body>
+<h2>Welcome, [[${firstName}]]!</h2>
+<p>Please fill in a few details to complete your registration:</p>
+
+<form method="POST" action="/register">
+    <input type="hidden" name="firstName" th:value="${firstName}">
+    <input type="hidden" name="lastName" th:value="${lastName}">
+
+    <label for="year">Year:</label>
+    <select name="year" required>
+        <option value="">--Select--</option>
+        <option>Freshman</option>
+        <option>Sophomore</option>
+        <option>Junior</option>
+        <option>Senior</option>
+    </select>
+    <br>
+
+    <label for="major">Major:</label>
+    <input type="text" name="major" required>
+    <br>
+
+    <button type="submit">Submit</button>
+</form>
+</body>
+</html>

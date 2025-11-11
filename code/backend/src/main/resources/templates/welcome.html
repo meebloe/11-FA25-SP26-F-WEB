@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Welcome</title>
+</head>
+<body>
+<h1 th:text="${message}"></h1>
+
+<div th:if="${student}">
+    <h2>Record Your Visit</h2>
+    <form method="POST" action="/add-visit">
+        <input type="hidden" name="studentId" th:value="${student.id}">
+        <label for="items">Items Received:</label><br>
+        <textarea name="items" id="items" rows="3" cols="40" placeholder="e.g., 2 cans of soup, 1 box of cereal"></textarea><br><br>
+        <button type="submit">Submit</button>
+    </form>
+</div>
+
+<p th:text="${confirmationMessage}"></p>
+</body>
+</html>
