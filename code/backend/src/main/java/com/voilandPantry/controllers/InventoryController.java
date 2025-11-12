@@ -91,7 +91,29 @@ public class InventoryController {
         ));
     }
 
-    // Scan-in endpoint: accepts JSON { "code": "<UPC>", "productName": "..." (optional), "netWeight": 12.5 (optional) }
+    // Barcode check endpoint: returns 200 if code exists, 404 if not
+    @PostMapping(path = "/inventory/barcodecheck", consumes = "application/json", produces = "application/json")
+    @ResponseBody
+    public ResponseEntity<Map<String, Object>> barcodeCheck(@RequestBody Map<String, String> payload) {
+        String code = payload.get("code");
+        if (code == null || code.trim().isEmpty()) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(Map.of("status", "error", "message", "Missing code"));
+        }
+        Optional<Inventory> optional = inventoryRepository.findByUpc(code.trim());
+        if (optional.isPresent()) {
+            Inventory item = optional.get();
+            return ResponseEntity.ok(Map.of(
+                    "status", "found",
+                    "upc", item.getUpc(),
+                    "productName", item.getProductName(),
+                    "netWeight", item.getNetWeight(),
+                    "currentQuantity", item.getQuantity()
+            ));
+        }
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(Map.of("status", "not_found"));
+    }
+
+    // Scan-in endpoint: accepts JSON { "code": "<UPC>", "quantity": <int>, "productName": "..." (optional), "netWeight": 12.5 (optional) }
     @PostMapping(path = "/inventory/scanin", consumes = "application/json", produces = "application/json")
     @ResponseBody
     public ResponseEntity<Map<String, Object>> scanIn(@RequestBody Map<String, Object> payload) {
@@ -99,10 +121,25 @@ public class InventoryController {
         if (code == null || code.isEmpty()) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(Map.of("status", "error", "message", "Missing code"));
         }
+        
+        // Parse quantity
+        int quantity = 0;
+        Object quantityObj = payload.get("quantity");
+        if (quantityObj != null) {
+            try {
+                quantity = Integer.parseInt(quantityObj.toString());
+            } catch (NumberFormatException e) {
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(Map.of("status", "error", "message", "Invalid quantity"));
+            }
+        } else {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(Map.of("status", "error", "message", "Missing quantity"));
+        }
+        
         Optional<Inventory> optional = inventoryRepository.findByUpc(code);
         if (optional.isPresent()) {
+            // Item exists: add quantity
             Inventory item = optional.get();
-            item.setQuantity(item.getQuantity() + 1);
+            item.setQuantity(item.getQuantity() + quantity);
             inventoryRepository.save(item);
             return ResponseEntity.ok(Map.of(
                     "status", "ok",
@@ -112,7 +149,7 @@ public class InventoryController {
             ));
         }
 
-        // not found: check if payload contains productName and netWeight to create new record
+        // Item not found: create new record if productName and netWeight are provided
         Object nameObj = payload.get("productName");
         Object netObj = payload.get("netWeight");
         if (nameObj != null && netObj != null) {
@@ -123,7 +160,7 @@ public class InventoryController {
             } catch (NumberFormatException e) {
                 netWeight = 0.0;
             }
-            Inventory newItem = new Inventory(code, name, netWeight, 1);
+            Inventory newItem = new Inventory(code, name, netWeight, quantity);
             inventoryRepository.save(newItem);
             return ResponseEntity.status(HttpStatus.CREATED).body(Map.of(
                     "status", "created",
@@ -133,6 +170,6 @@ public class InventoryController {
             ));
         }
 
-        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(Map.of("status", "not_found"));
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(Map.of("status", "not_found", "message", "Product not found and product details not provided"));
     }
 }
