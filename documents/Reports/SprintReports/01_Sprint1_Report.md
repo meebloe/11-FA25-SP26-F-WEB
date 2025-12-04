@@ -1,4 +1,4 @@
-# Sprint x Report (Dates from Sprint * to Sprint *)
+# Sprint 1 Report (Dates from Sprint * to Sprint *)
 
 ## YouTube link of Sprint * Video (Make this video unlisted)  
 
@@ -8,6 +8,7 @@
  * Requirements gathered from client/stakeholders and documented (functional + non-functional).
  * GitHub repository structure set up following project standards.
  * Kanban board created to track issues, progress, and dependencies.
+ * HTML mockup created.
 
 ## Work Summary (Developer Facing)
 During Sprint 1, our team focused on laying the foundation for the project. We met with the client and stakeholders to gather requirements, documented those requirements into clear functional and non-functional categories, and then developed corresponding user stories and use cases. To support these, we created UML diagrams to show relationships between system components and interactions. We also set up our GitHub repository following the suggested structure, added templates for issues, and initialized a Kanban board to organize our work and visualize dependencies. One barrier we encountered is that our implementation work depends on the data team delivering their code. Until that happens, our work has centered on planning and design rather than coding. A key learning was the importance of aligning schedules with other dependent teams early in the process to avoid delays.
@@ -18,30 +19,15 @@ No coding tasks were completed in this sprint because we are dependent on the da
 ## Completed Issues/User Stories
 Here are links to the issues that we completed in this sprint:
 
- * [Insert GitHub issue link for Documentation Updates]
- * [Insert GitHub issue link for User Stories & Use Cases]
- * [Insert GitHub issue link for UML Diagrams]
- * [Insert GitHub issue link for Kanban Board Setup]
- * [Insert GitHub issue link for Repo Structure Setup]
-
- Reminders (Remove this section when you save the file):
-  * Each issue should be assigned to a milestone
-  * Each completed issue should be assigned to a pull request
-  * Each completed pull request should include a link to a "Before and After" video
-  * All team members who contributed to the issue should be assigned to it on GitHub
-  * Each issue should be assigned story points using a label
-  * Story points contribution of each team member should be indicated in a comment
+ * (https://github.com/meebloe/11-FA25-SP26-F-WEB/issues/2#issue-3489262236)
+ * (https://github.com/meebloe/11-FA25-SP26-F-WEB/issues/3#issue-3489268723)
+ * (https://github.com/meebloe/11-FA25-SP26-F-WEB/issues/4#issue-3489271535)
+ * (https://github.com/meebloe/11-FA25-SP26-F-WEB/issues/5#issue-3489277966)
+ * (https://github.com/meebloe/11-FA25-SP26-F-WEB/issues/6#issue-3489281926)
  
  ## Incomplete Issues/User Stories
- Here are links to issues we worked on but did not complete in this sprint:
- 
- * [Insert GitHub issue link for Initial Feature Implementation] – Could not begin without dependent data integration.
- 
- Examples of explanations (Remove this section when you save the file):
-  * "We ran into a complication we did not anticipate (explain briefly)." 
-  * "We decided that the feature did not add sufficient value for us to work on it in this sprint (explain briefly)."
-  * "We could not reproduce the bug" (explain briefly).
-  * "We did not get to this issue because..." (explain briefly)
+ Here are links to issues we worked on but did not complete in this sprint
+ * https://github.com/meebloe/11-FA25-SP26-F-WEB/issues/1#issue-3489256194 - will continue to add to this issue throughout the project.
 
 ## Code Files for Review
 No code files were developed in Sprint 1, as the team is awaiting the data deliverables before beginning implementation.
