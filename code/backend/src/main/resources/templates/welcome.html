@@ -3,7 +3,14 @@
 <head>
     <meta charset="UTF-8">
     <title>Welcome</title>
+    <link rel="stylesheet" href="/css/style.css">
+
+    <!-- Ding sound -->
+    <audio id="dingSound">
+        <source src="/sounds/ding.mp3" type="audio/mpeg">
+    </audio>
 </head>
+
 <body>
 <h1 th:text="${message}"></h1>
 
@@ -11,12 +18,134 @@
     <h2>Record Your Visit</h2>
     <form method="POST" action="/add-visit">
         <input type="hidden" name="studentId" th:value="${student.id}">
+
         <label for="items">Items Received:</label><br>
-        <textarea name="items" id="items" rows="3" cols="40" placeholder="e.g., 2 cans of soup, 1 box of cereal"></textarea><br><br>
+        <textarea name="items" id="items" rows="3" cols="40"
+                  placeholder="List will auto-fill as you scan items"></textarea><br><br>
+
+        <!-- Live scanned item list -->
+        <div id="scannedList" style="margin-bottom:15px; font-weight:bold;"></div>
+
         <button type="submit">Submit</button>
     </form>
 </div>
 
 <p th:text="${confirmationMessage}"></p>
+
+<!-- ======================= -->
+<!--   CHECKOUT POPUP UI     -->
+<!-- ======================= -->
+<h2>Checkout Items via Barcode</h2>
+<button type="button" onclick="openCheckoutPopup()">Scan Item</button>
+
+<div id="checkoutPopup" style="display:none; position:fixed; left:50%; top:50%;
+    transform:translate(-50%,-50%); background:white; padding:20px;
+    border:1px solid #ccc; box-shadow:0 0 10px rgba(0,0,0,0.4); z-index:1000;">
+    <h3>Scan Item to Checkout</h3>
+
+    <p id="checkoutStatus" style="color:green; font-weight:bold;"></p>
+
+    <form id="checkoutForm" onsubmit="handleCheckout(event)">
+        <label>Product Code:</label><br>
+        <input type="text" id="productCode" required style="font-size:18px;"><br><br>
+
+        <button type="button" onclick="closeCheckoutPopup()">Cancel</button>
+    </form>
+</div>
+
+<script>
+/* ============================================================
+   CHECKOUT BARCODE SCANNING — STUDENT VERSION
+============================================================ */
+function openCheckoutPopup() {
+    const popup = document.getElementById('checkoutPopup');
+    const input = document.getElementById('productCode');
+    const status = document.getElementById('checkoutStatus');
+    status.textContent = "";
+    popup.style.display = 'block';
+    input.focus();
+    input.select();
+    if (window.checkoutDebounce) clearTimeout(window.checkoutDebounce);
+}
+
+function closeCheckoutPopup() {
+    document.getElementById('checkoutPopup').style.display = 'none';
+    document.getElementById('productCode').value = '';
+    document.getElementById('checkoutStatus').textContent = '';
+    if (window.checkoutDebounce) clearTimeout(window.checkoutDebounce);
+}
+
+/* Handle successful checkout updates */
+function handleSuccess(data, code) {
+    const ding = document.getElementById("dingSound");
+    ding.play().catch(() => {});
+
+    // Show message in popup
+    const status = document.getElementById('checkoutStatus');
+    status.textContent = `Checked out: ${data.productName} (Remaining: ${data.newQuantity})`;
+
+    // Add to growing scanned list
+    const scannedList = document.getElementById("scannedList");
+    scannedList.innerHTML += `✔ ${data.productName}<br>`;
+
+    // Auto-append to items textarea
+    const itemsBox = document.getElementById("items");
+    itemsBox.value += `${data.productName}\n`;
+
+    // Reset field for next scan
+    const input = document.getElementById('productCode');
+    input.value = "";
+    input.focus();
+}
+
+/* Perform checkout request */
+function submitCheckout() {
+    const code = document.getElementById('productCode').value.trim();
+    if (!code) return;
+
+    fetch('/inventory/checkout', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ code })
+    })
+    .then(async resp => {
+        if (resp.ok) {
+            const data = await resp.json();
+            handleSuccess(data, code);
+        } else {
+            const err = await resp.json().catch(() => null);
+            alert('Checkout failed: ' + (err?.message || 'Unknown error'));
+        }
+    })
+    .catch(e => alert('Checkout request failed'));
+}
+
+function handleCheckout(e) {
+    e.preventDefault();
+    submitCheckout();
+}
+
+/* Barcode auto-submit */
+document.addEventListener('DOMContentLoaded', () => {
+    const input = document.getElementById('productCode');
+    if (!input) return;
+
+    // On manual Enter
+    input.addEventListener('keydown', e => {
+        if (e.key === 'Enter') {
+            e.preventDefault();
+            submitCheckout();
+        }
+    });
+
+    // On scan (barcode scanners "type" fast)
+    input.addEventListener('input', function() {
+        if (window.checkoutDebounce) clearTimeout(window.checkoutDebounce);
+        if (!this.value) return;
+        window.checkoutDebounce = setTimeout(submitCheckout, 250);
+    });
+});
+</script>
+
 </body>
 </html>

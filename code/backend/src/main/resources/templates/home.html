@@ -4,17 +4,53 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Food Pantry</title>
-    <!-- Use Spring Boot static path -->
     <link rel="stylesheet" href="/css/style.css">
+    <style>
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px 30px;
+        }
+        header img {
+            height: 80px;
+        }
+        header h1 {
+            margin-left: 15px;
+            cursor: pointer;
+        }
+        .header-buttons {
+            display: flex;
+            gap: 15px;
+        }
+        .header-buttons button {
+            padding: 10px 15px;
+            border: 1px solid #333;
+            border-radius: 5px;
+            background-color: #f5f5f5;
+            color: black;
+            cursor: pointer;
+            transition: background-color 0.2s ease;
+        }
+        .header-buttons button:hover {
+            background-color: #e0e0e0;
+        }
+    </style>
 </head>
 <body>
     <header>
-        <img src="/images/cougar_mock-up.png" alt="Logo for WSU">
-        <!-- Link through Spring Boot route -->
-        <h1 onclick="window.location.href='/'">Voiland Food Pantry</h1>
+        <div style="display: flex; align-items: center;">
+            <img src="/images/cougar_mock-up.png" alt="Logo for WSU">
+            <h1 onclick="window.location.href='/'">Voiland Food Pantry</h1>
+        </div>
+        <!-- New Dashboard button -->
+        <div class="header-buttons">
+            <button onclick="window.location.href='/admin/dashboard'">Dashboard</button>
+        </div>
     </header>
 
     <div class="main-content">
+
         <h2>Introduction to Services</h2>
         <h3>Providing Free Food to All Students</h3>
         <p>Dana 107</p>
@@ -24,15 +60,12 @@
         <h3>Monday-Friday 3:00pm-5:00pm</h3>
 
         <div>
-            <button onclick="window.location.href='/inventory'">Inventory</button>
-            <button onclick="window.location.href='/login'">Login</button>
-            <button onclick="window.location.href='/volunteer-form'">Volunteer Form</button>
-            <button onclick="window.location.href='/card-reader'">Card Reader Selection</button>
+            <h2>Portals</h2>
+            <button onclick="window.location.href='/login'">Student Portal</button>
+            <button onclick="window.location.href='/admin-login'">Staff/Admin Portal</button>
         </div>
-    </div>
 
-    <footer>
-        Note: Generative AI was used in making this site. See "html_mock-up_prompt.txt" for the ChatGPT entry.
-    </footer>
+    </div> <!-- closes .main-content -->
+
 </body>
 </html>

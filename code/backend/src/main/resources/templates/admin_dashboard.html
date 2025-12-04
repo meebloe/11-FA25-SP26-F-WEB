@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity6">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard</title>
+    <link rel="stylesheet" href="/css/style.css">
+    <style>
+        /* Header like home.html */
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px 30px;
+        }
+        header img {
+            height: 80px;
+        }
+        header h1 {
+            margin-left: 15px;
+            cursor: pointer;
+        }
+        .logout-section {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+        .logout-section form {
+            margin: 0;
+        }
+
+        /* Main content */
+        .main-content {
+            max-width: 900px;
+            margin: 120px auto 40px auto;
+            padding: 0 20px;
+        }
+
+        /* Welcome message */
+        .welcome-msg {
+            font-size: 1.2em;
+            margin-bottom: 40px;
+            text-align: center;
+        }
+
+        /* Dashboard buttons */
+        .dashboard-buttons {
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+            justify-content: center;
+            margin-bottom: 40px;
+        }
+        .dashboard-buttons button {
+            padding: 15px 25px;
+            font-size: 1em;
+            border: 1px solid #333;
+            border-radius: 5px;
+            background-color: #f5f5f5;
+            color: black;
+            cursor: pointer;
+            transition: background-color 0.2s ease;
+        }
+        .dashboard-buttons button:hover {
+            background-color: #e0e0e0;
+        }
+
+        /* Forms and admin list */
+        .admin-form, .current-admins {
+            background-color: #f9f9f9;
+            padding: 20px;
+            border-radius: 5px;
+            margin-bottom: 30px;
+        }
+
+        /* Center the Add Admin form */
+        .admin-form form {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 15px;
+        }
+
+        /* Label + input side by side */
+        .form-row {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            width: 100%;
+            max-width: 400px;
+        }
+        .form-row label {
+            flex: 1;
+            text-align: right;
+        }
+        .form-row input {
+            flex: 2;
+            padding: 8px;
+            box-sizing: border-box;
+        }
+
+        .admin-form button {
+            padding: 10px 15px;
+            border: 1px solid #333;
+            background-color: #f5f5f5;
+            color: black;
+            cursor: pointer;
+            border-radius: 5px;
+        }
+        .admin-form button:hover {
+            background-color: #e0e0e0;
+        }
+
+        .message p {
+            margin: 0;
+        }
+    </style>
+</head>
+<body>
+
+<header>
+    <div style="display: flex; align-items: center;">
+        <img src="/images/cougar_mock-up.png" alt="WSU Logo">
+        <h1 onclick="window.location.href='/'">Voiland Food Pantry</h1>
+    </div>
+    <div class="logout-section">
+        <span>Logged in as: <span sec:authentication="name">Admin</span></span>
+        <form action="/logout" method="post">
+            <button type="submit">Logout</button>
+        </form>
+    </div>
+</header>
+
+<div class="main-content">
+    <div class="welcome-msg">
+        <p>Welcome, <span sec:authentication="name">Admin</span>! You now have full access to the Admin Dashboard.</p>
+    </div>
+
+    <div class="dashboard-buttons">
+        <button onclick="window.location.href='/inventory'">Inventory</button>
+        <button onclick="window.location.href='/volunteer-form'">Volunteer Form</button>
+        <button onclick="window.location.href='/card-reader'">Card Reader</button>
+        <!-- New Back to Home button -->
+        <button onclick="window.location.href='/'">Back to Home</button>
+    </div>
+
+    <div class="admin-form">
+        <h2 style="text-align:center;">Add New Admin</h2>
+        <form action="/admin/add" method="post">
+            <div class="form-row">
+                <label>Username:</label>
+                <input type="text" name="username" required>
+            </div>
+            <div class="form-row">
+                <label>Password:</label>
+                <input type="password" name="password" required>
+            </div>
+            <button type="submit">Add Admin</button>
+        </form>
+        <div class="message" th:if="${error}" style="color:red;">
+            <p th:text="${error}"></p>
+        </div>
+        <div class="message" th:if="${success}" style="color:green;">
+            <p th:text="${success}"></p>
+        </div>
+    </div>
+
+    <div class="current-admins">
+        <h2>Current Admin Users</h2>
+        <ul>
+            <li th:each="admin : ${admins}" th:text="${admin.username}"></li>
+        </ul>
+    </div>
+</div>
+
+</body>
+</html>

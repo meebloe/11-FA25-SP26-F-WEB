@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Admin Login</title>
+    <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+<header>
+    <h1>Admin Login</h1>
+</header>
+
+<div class="main-content">
+    <form th:action="@{/perform_login}" method="post">
+        <label>Username: <input type="text" name="username" required></label><br>
+        <label>Password: <input type="password" name="password" required></label><br>
+        <button type="submit">Login</button>
+    </form>
+
+    <!-- Optional: display login error -->
+    <div th:if="${param.error}" style="color:red;">
+        Invalid username or password
+    </div>
+</div>
+</body>
+</html>
