@@ -2,15 +2,11 @@
 
 ## Project Summary
 
-A web application allowing Voiland Food Pantry customers to sign in and volunteers/staff to manage customer analytics, food inventory, and volunteer hours.
+A web application allowing Voiland Food Pantry customers to sign in and volunteers/staff to manage customer analytics, food inventory, and volunteer hours, with associated hardware integration.
 
 ### Additional Information
 
-This application aims to take the place of the Food Pantry's physical sign-in sheet to make recording visits and volunteer work simpler and more efficient. 
-To do this, the website will integrate a Cougar Card swiping system and a barcode scanner for ease of use for all types of users. 
-Both customers and volunteers will be able to swipe their Cougar Card or use the website to either log their visit or clock in/out.
-Volunteers can update the food inventory database by scanning barcodes associated with food items in the pantry's stock. This will ensure the Food Pantry stock is well-managed and accurate.  
-Food Pantry staff/administrators can view, manage, edit, and print records relating to food inventory, pantry visits, and volunteer hours. 
+This application aims to take the place of the Food Pantry's physical sign-in sheet to make recording visits and volunteer work simpler and more efficient. To do this, the website will integrate a Cougar Card swiping system with a magstripe reader and an inventory management system with a barcode scanner for ease of use for all types of users. Both customers and staff/administrators will be able to swipe their Cougar Card or use the website to either log their visit or clock in/out. Staff/administrators can update the food inventory database by scanning barcodes associated with food items in the pantry's stock. This will ensure the Food Pantry stock is well-managed and accurate. Food pantry staff/administrators can view, manage, edit, and print records relating to food inventory, pantry visits, and volunteer hours, while customers can access the barcode reader to check out food items. 
 
 ## Installation
 
@@ -47,7 +43,11 @@ TBD
 
 ## Additional Documentation
 
-Sprint 1: TBD
+[Sprint 1 Report](https://github.com/meebloe/11-FA25-SP26-F-WEB/blob/main/documents/Reports/SprintReports/01_Sprint1_Report.md)
+
+[Sprint 2 Report](https://github.com/meebloe/11-FA25-SP26-F-WEB/blob/main/documents/Reports/SprintReports/02_Sprint2_Report.md)
+
+[Sprint 3 Report](https://github.com/meebloe/11-FA25-SP26-F-WEB/blob/main/documents/Reports/SprintReports/03_Sprint3_Report.md)
 
 ## License
 
@@ -70,3 +70,4 @@ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
+
