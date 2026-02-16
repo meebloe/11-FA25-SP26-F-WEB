@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+<meta charset="UTF-8">
+<title>Pantry Report PDF</title>
+<style>
+    body { font-family: Arial, sans-serif; margin: 20px; color: #333; }
+    h1, h2 { text-align: center; color: #502c2c; }
+    h2 { margin-top: 0; }
+    table { width: 100%; border-collapse: collapse; margin-bottom: 20px; }
+    th, td { border: 1px solid #db3434; padding: 8px; }
+    th { background-color: #db3434; color: white; }
+    .low-stock { color: #e74c3c; }
+</style>
+</head>
+<body>
+
+<h1>Voiland Food Pantry</h1>
+<h2>Pantry Analytics Report</h2>
+
+<p>Total Inventory Items: <span th:text="${totalItems}">0</span></p>
+<p>Low Stock Items (<span th:text="${lowStockCount}">0</span>):</p>
+<ul>
+    <li th:each="item : ${inventoryList}" th:if="${item.quantity <= 5}" th:text="${item.productName}">Sample Item</li>
+</ul>
+
+<h3>Student Visits by Major</h3>
+<table>
+<thead><tr><th>Major</th><th>Total Visits</th></tr></thead>
+<tbody>
+<tr th:each="row : ${visitsByMajor}">
+    <td th:text="${row[0]}"></td>
+    <td th:text="${row[1]}"></td>
+</tr>
+</tbody>
+</table>
+
+<h3>Popular Items by Major</h3>
+<table>
+<thead><tr><th>Major</th><th>Most Popular Item</th><th>Frequency</th></tr></thead>
+<tbody>
+<tr th:each="row : ${itemsByMajor}">
+    <td th:text="${row[0]}"></td>
+    <td th:text="${row[1]}"></td>
+    <td th:text="${row[2]}"></td>
+</tr>
+</tbody>
+</table>
+
+<h3>Monthly Activity</h3>
+<table>
+<thead><tr><th>Month</th><th>Item</th><th>Count</th></tr></thead>
+<tbody>
+<tr th:each="row : ${itemsPerMonth}">
+    <td th:text="${T(java.time.Month).of(row[0]).name()}"></td>
+    <td th:text="${row[1]}"></td>
+    <td th:text="${row[2]}"></td>
+</tr>
+</tbody>
+</table>
+
+<h3>Full Inventory</h3>
+<table>
+<thead><tr><th>UPC</th><th>Product Name</th><th>Weight</th><th>Quantity</th></tr></thead>
+<tbody>
+<tr th:each="item : ${inventoryList}">
+    <td th:text="${item.upc}"></td>
+    <td th:text="${item.productName}"></td>
+    <td th:text="${item.netWeight}"></td>
+    <td th:text="${item.quantity}"></td>
+</tr>
+</tbody>
+</table>
+
+</body>
+</html>
