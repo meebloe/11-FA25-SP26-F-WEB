@@ -1,9 +1,13 @@
 package com.voilandPantry.models;
 
 import java.time.LocalDateTime;
-import jakarta.persistence.PrePersist;
 
-import jakarta.persistence.*;
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.ManyToOne;
+import jakarta.persistence.PrePersist;
 
 @Entity
 public class Visit {

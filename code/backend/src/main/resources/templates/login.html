@@ -4,27 +4,74 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Student Sign-In - Food Pantry</title>
-    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="/css/style.css">
 </head>
 <body>
 <header>
-    <h1>Voiland Food Pantry</h1>
+    <img src="/images/cougar_mock-up.png" alt="Logo for WSU">
+    <h1 onclick="window.location.href='/'">Voiland Food Pantry</h1>
 </header>
 
 <div class="main-content">
-    <h2>Student Sign-In</h2>
-    <form method="POST" action="/login">
-        <div>
-            <label for="firstName">First Name:</label>
-            <input type="text" id="firstName" name="firstName" required>
-        </div>
-        <div>
-            <label for="lastName">Last Name:</label>
-            <input type="text" id="lastName" name="lastName" required>
-        </div>
-        <button type="submit">Sign In</button>
-    </form>
+    <!-- Login Popup -->
+    <div id="loginPopup" style="position: fixed; left: 50%; top: 50%; transform: translate(-50%, -50%); 
+        background-color: white; padding: 40px; border: 1px solid #ccc; box-shadow: 0 0 10px rgba(0,0,0,0.5); 
+        z-index: 1000; text-align: center; min-width: 400px; border-radius: 8px;">
+        <h2>Student Sign-In</h2>
+        <p style="font-size: 18px; color: #666; margin: 20px 0;">Please swipe your Cougar Card</p>
+        <form id="loginForm" method="POST" action="/login">
+            <input type="text" id="identifier" name="identifier" autofocus style="opacity: 0; width: 0; height: 0; padding: 0; border: none; position: absolute;">
+        </form>
+    </div>
+
+    <div class="back-btn-wrapper" style="position: fixed; bottom: 20px; left: 20px;">
+        <button onclick="window.location.href='/'">Back to Home</button>
+    </div>
 </div>
 
+<script>
+let inputDebounceTimer;
+
+function handleLogin() {
+    const identifier = document.getElementById('identifier').value.trim();
+    if (!identifier) return;
+
+    // Debug statement
+    console.log('DEBUG: Identifier = ' + identifier);
+    
+    // Submit the form
+    document.getElementById('loginForm').submit();
+
+        // Clear the input field for next swipe
+    document.getElementById('identifier').value = '';
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+    const input = document.getElementById('identifier');
+    input.focus();
+    
+    input.addEventListener('keydown', e => {
+        if (e.key === 'Enter') {
+            e.preventDefault();
+            clearTimeout(inputDebounceTimer);
+            handleLogin();
+        }
+    });
+    
+    input.addEventListener('input', () => {
+        // Clear the previous debounce timer
+        clearTimeout(inputDebounceTimer);
+        
+        // Set a new timer - submit only after 500ms of no input
+        inputDebounceTimer = setTimeout(() => {
+            if (input.value.trim().length > 0) {
+                handleLogin();
+            }
+        }, 500);
+    });
+});
+</script>
+
+<footer></footer>
 </body>
 </html>

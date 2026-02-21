@@ -1,5 +1,6 @@
 package com.voilandPantry.models;
 
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -12,17 +13,16 @@ public class Student {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    private String firstName;
-    private String lastName;
+    @Column(unique = true, nullable = false)
+    private String identifier;
     private String year;
     private String major;
 
     // Constructors
     public Student() {}
 
-    public Student(String firstName, String lastName, String year, String major) {
-        this.firstName = firstName;
-        this.lastName = lastName;
+    public Student(String identifier, String year, String major) {
+        this.identifier = identifier;
         this.year = year;
         this.major = major;
     }
@@ -30,11 +30,8 @@ public class Student {
     // Getters and Setters
     public Long getId() { return id; }
 
-    public String getFirstName() { return firstName; }
-    public void setFirstName(String firstName) { this.firstName = firstName; }
-
-    public String getLastName() { return lastName; }
-    public void setLastName(String lastName) { this.lastName = lastName; }
+    public String getIdentifier() { return identifier; }
+    public void setIdentifier(String identifier) { this.identifier = identifier; }
 
     public String getYear() { return year; }
     public void setYear(String year) { this.year = year; }
