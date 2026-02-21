@@ -49,6 +49,8 @@ TBD
 
 [Sprint 3 Report](https://github.com/meebloe/11-FA25-SP26-F-WEB/blob/main/documents/Reports/SprintReports/03_Sprint3_Report.md)
 
+[Sprint 4 Report](https://github.com/meebloe/11-FA25-SP26-F-WEB/blob/main/documents/Reports/SprintReports/04_Sprint4_Report.md)
+
 ## License
 
 Copyright (c) [2025] [Voiland Food Pantry]
@@ -70,4 +72,5 @@ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
+
 
