@@ -1,14 +1,18 @@
 package com.voilandPantry.controllers;
 
+import org.springframework.stereotype.Controller;
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+
 import com.voilandPantry.models.Student;
 import com.voilandPantry.models.Visit;
 import com.voilandPantry.repositories.StudentRepository;
 import com.voilandPantry.repositories.VisitRepository;
+
 import jakarta.servlet.http.HttpSession;
-import org.springframework.stereotype.Controller;
-import org.springframework.ui.Model;
-import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.bind.annotation.*;
 
 
 @Controller
@@ -59,6 +63,6 @@ public class VisitController {
             }
             session.removeAttribute("visitId");
         }
-        return "redirect:/"; // You can create a thank-you page
+        return "redirect:/login"; // Redirect to student login page after visit submission
     }
 }

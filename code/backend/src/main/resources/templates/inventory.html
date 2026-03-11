@@ -13,14 +13,14 @@
     <h1 onclick="window.location.href='/'">Voiland Food Pantry</h1>
 </header>
 
-<div class="main-content">
+<div class="main-content" style="padding-bottom: 260px; margin-top: 60px;">
     <h2>Pantry Inventory</h2>
 
     <div class="inventory-toolbar">
         <form method="get" action="/inventory" style="display:flex; gap:10px; flex-wrap: wrap;">
             <input type="text" name="search" placeholder="Search by product name" th:value="${search}">
             <button type="submit">Search</button>
-            <button type="button" onclick="window.location.href='/inventory'">Clear</button>
+            <button type="button" onclick="window.location.href='/inventory'">Clear Search</button>
             <button type="button" onclick="window.location.href='/inventory'">View All</button>
         </form>
     </div>
@@ -384,5 +384,10 @@ document.addEventListener('DOMContentLoaded', () => {
 </script>
 
 <footer></footer>
+
+<section role="region" aria-label="Instructions" style="background-color: #f0f4f8; padding: 12px 20px; border-left: 4px solid #A60F2D; border-radius: 4px; position: fixed; bottom: 0; left: 0; right: 0; z-index: 999; box-shadow: 0 -2px 8px rgba(0,0,0,0.1);">
+    <p style="margin: 0; font-size: 16px; color: #333;"><strong>Manage inventory:</strong> Search for items, click Edit to change quantities, or use Scan In to add new products.</p>
+</section>
+
 </body>
 </html>
