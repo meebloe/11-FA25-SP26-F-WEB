@@ -66,25 +66,40 @@
     </form>
 </div>
 
-<!-- Scan In Popup -->
-<div id="scanInPopup" style="display: none; position: fixed; left: 50%; top: 50%; transform: translate(-50%, -50%); 
+<!-- Scan In Code Popup -->
+<div id="scanInCodePopup" style="display: none; position: fixed; left: 50%; top: 50%; transform: translate(-50%, -50%); 
     background-color: white; padding: 20px; border: 1px solid #ccc; box-shadow: 0 0 10px rgba(0,0,0,0.5); z-index: 1000;">
     <h3>Scan In Item</h3>
-    <form id="scanInForm" onsubmit="handleScanIn(event)">
-        <label>Product Code:</label><br>
-        <input type="text" id="scanInCode" required><br><br>
+    <label>Product Code:</label><br>
+    <input type="text" id="scanInCode" placeholder="Scan or type UPC"><br><br>
+    <button type="button" onclick="closeScanInPopup()">Cancel</button>
+</div>
 
-        <div id="scanInDetails" style="display:none; margin-top:10px;">
-            <p>No existing item found — create new item:</p>
-            <label>Product Name:</label><br>
-            <input type="text" id="scanInProductName" required><br>
-            <label>Net Weight (oz):</label><br>
-            <input type="number" id="scanInNetWeight" step="0.01" required><br><br>
-        </div>
+<!-- Scan In Quantity Popup (for existing items) -->
+<div id="scanInQuantityPopup" style="display: none; position: fixed; left: 50%; top: 50%; transform: translate(-50%, -50%); 
+    background-color: white; padding: 20px; border: 1px solid #ccc; box-shadow: 0 0 10px rgba(0,0,0,0.5); z-index: 1000;">
+    <h3>Add Quantity</h3>
+    <p>Product: <span id="existingProductName" style="font-weight: bold;"></span></p>
+    <label>Quantity to Add:</label><br>
+    <input type="number" id="quantityToAdd" min="1" value="1" required><br><br>
+    <button type="button" onclick="submitQuantityAdd()">Submit</button>
+    <button type="button" onclick="closeScanInPopup()">Cancel</button>
+</div>
 
-        <button type="submit">Submit</button>
-        <button type="button" onclick="closeScanInPopup()">Cancel</button>
-    </form>
+<!-- Scan In New Item Popup (for new items) -->
+<div id="scanInNewItemPopup" style="display: none; position: fixed; left: 50%; top: 50%; transform: translate(-50%, -50%); 
+    background-color: white; padding: 20px; border: 1px solid #ccc; box-shadow: 0 0 10px rgba(0,0,0,0.5); z-index: 1000;">
+    <h3>Create New Item</h3>
+    <label>Product Code (UPC):</label><br>
+    <input type="text" id="newItemCode" readonly><br><br>
+    <label>Product Name:</label><br>
+    <input type="text" id="newItemProductName" required><br><br>
+    <label>Net Weight (oz):</label><br>
+    <input type="number" id="newItemNetWeight" step="0.01" required><br><br>
+    <label>Quantity:</label><br>
+    <input type="number" id="newItemQuantity" min="1" value="1" required><br><br>
+    <button type="button" onclick="submitNewItem()">Submit</button>
+    <button type="button" onclick="closeScanInPopup()">Cancel</button>
 </div>
 
 <script>
@@ -235,83 +250,136 @@ document.addEventListener('DOMContentLoaded', () => {
 
 /* --- Scan In Functions --- */
 function openScanInPopup() {
-    const popup = document.getElementById('scanInPopup');
+    const popup = document.getElementById('scanInCodePopup');
     const input = document.getElementById('scanInCode');
-    const details = document.getElementById('scanInDetails');
     popup.style.display = 'block';
-    details.style.display = 'none';
-    document.getElementById('scanInProductName').value = '';
-    document.getElementById('scanInNetWeight').value = '';
+    input.value = '';
     input.focus();
-    input.select();
-    if (window.scanInDebounce) clearTimeout(window.scanInDebounce);
 }
 
 function closeScanInPopup() {
-    document.getElementById('scanInPopup').style.display = 'none';
+    document.getElementById('scanInCodePopup').style.display = 'none';
+    document.getElementById('scanInQuantityPopup').style.display = 'none';
+    document.getElementById('scanInNewItemPopup').style.display = 'none';
     document.getElementById('scanInCode').value = '';
-    document.getElementById('scanInProductName').value = '';
-    document.getElementById('scanInNetWeight').value = '';
-    if (window.scanInDebounce) clearTimeout(window.scanInDebounce);
+    document.getElementById('quantityToAdd').value = '1';
+    document.getElementById('newItemCode').value = '';
+    document.getElementById('newItemProductName').value = '';
+    document.getElementById('newItemNetWeight').value = '';
+    document.getElementById('newItemQuantity').value = '1';
 }
 
-function submitScanIn() {
+function checkBarcode() {
     const code = document.getElementById('scanInCode').value.trim();
-    if (!code) return;
+    if (!code) {
+        alert('Please enter a product code');
+        return;
+    }
 
-    fetch('/inventory/scanin', {
+    // Call barcodecheck endpoint
+    fetch('/inventory/barcodecheck', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ code })
     })
     .then(async resp => {
         if (resp.ok) {
+            // Item found - show quantity input popup
             const data = await resp.json();
-            document.querySelectorAll('table tr').forEach((row, i) => {
-                if(i===0) return;
-                const cells = row.children;
-                if(cells[1].textContent.trim() === code) cells[4].textContent = data.newQuantity;
-            });
-            closeScanInPopup();
-        } else if (resp.status===404) {
-            document.getElementById('scanInDetails').style.display='block';
-            setTimeout(() => document.getElementById('scanInProductName').focus(), 50);
+            document.getElementById('existingProductName').textContent = data.productName;
+            document.getElementById('scanInCodePopup').style.display = 'none';
+            document.getElementById('scanInQuantityPopup').style.display = 'block';
+            document.getElementById('quantityToAdd').focus();
+        } else if (resp.status === 404) {
+            // Item not found - show new item creation popup
+            document.getElementById('newItemCode').value = code;
+            document.getElementById('scanInCodePopup').style.display = 'none';
+            document.getElementById('scanInNewItemPopup').style.display = 'block';
+            document.getElementById('newItemProductName').focus();
         } else {
-            const err = await resp.json().catch(()=>null);
-            alert('Scan In failed: ' + (err?.message || 'Unknown error'));
+            alert('Error checking barcode');
         }
     })
-    .catch(e=>alert('Scan In request failed'));
+    .catch(e => {
+        alert('Request failed: ' + e.message);
+    });
 }
 
-function handleScanIn(e) {
-    e.preventDefault();
-    const detailsVisible = document.getElementById('scanInDetails').style.display !== 'none';
-    if(detailsVisible){
-        const name = document.getElementById('scanInProductName').value.trim();
-        const netWeight = document.getElementById('scanInNetWeight').value;
-        if(!name){ alert('Enter product name'); return; }
-        if(!netWeight){ alert('Enter net weight'); return; }
-        const code = document.getElementById('scanInCode').value.trim();
-        fetch('/inventory/scanin', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ code, productName: name, netWeight: parseFloat(netWeight) })
-        })
-        .then(async resp => { if(resp.ok||resp.status===201) window.location.reload(); })
-        .catch(e=>alert('Create request failed'));
-    } else submitScanIn();
+function submitQuantityAdd() {
+    const code = document.getElementById('scanInCode').value.trim();
+    const quantity = parseInt(document.getElementById('quantityToAdd').value);
+    
+    if (!code || quantity < 1) {
+        alert('Invalid input');
+        return;
+    }
+
+    fetch('/inventory/scanin', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ code, quantity })
+    })
+    .then(async resp => {
+        if (resp.ok || resp.status === 201) {
+            window.location.reload();
+        } else {
+            const err = await resp.json().catch(() => null);
+            alert('Scan in failed: ' + (err?.message || 'Unknown error'));
+        }
+    })
+    .catch(e => alert('Request failed'));
+}
+
+function submitNewItem() {
+    const code = document.getElementById('newItemCode').value.trim();
+    const productName = document.getElementById('newItemProductName').value.trim();
+    const netWeight = parseFloat(document.getElementById('newItemNetWeight').value);
+    const quantity = parseInt(document.getElementById('newItemQuantity').value);
+
+    if (!code || !productName || !netWeight || quantity < 1) {
+        alert('Please fill in all fields');
+        return;
+    }
+
+    fetch('/inventory/scanin', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ code, productName, netWeight, quantity })
+    })
+    .then(async resp => {
+        if (resp.ok || resp.status === 201) {
+            window.location.reload();
+        } else {
+            const err = await resp.json().catch(() => null);
+            alert('Create item failed: ' + (err?.message || 'Unknown error'));
+        }
+    })
+    .catch(e => alert('Request failed'));
 }
 
 document.addEventListener('DOMContentLoaded', () => {
     const input = document.getElementById('scanInCode');
-    if(!input) return;
-    input.addEventListener('keydown', e => { if(e.key==='Enter'){ e.preventDefault(); submitScanIn(); }});
-    input.addEventListener('input', function(){
-        if(window.scanInDebounce) clearTimeout(window.scanInDebounce);
-        if(!this.value) return;
-        window.scanInDebounce = setTimeout(submitScanIn, 250);
-    });
+    if (input) {
+        input.addEventListener('keydown', e => {
+            if (e.key === 'Enter') {
+                e.preventDefault();
+                clearTimeout(window.scanInDebounce);
+                checkBarcode();
+            }
+        });
+        
+        input.addEventListener('input', () => {
+            // Clear the previous debounce timer
+            clearTimeout(window.scanInDebounce);
+            
+            // Set a new timer - auto-submit after 500ms of no input
+            window.scanInDebounce = setTimeout(() => {
+                if (input.value.trim().length > 0) {
+                    checkBarcode();
+                }
+            }, 500);
+        });
+    }
 });
 </script>
 
