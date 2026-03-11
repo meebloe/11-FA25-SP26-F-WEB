@@ -1,17 +1,23 @@
 package com.voilandPantry.controllers;
 
-import com.voilandPantry.models.Inventory;
-import com.voilandPantry.repositories.InventoryRepository;
-import org.springframework.stereotype.Controller;
-import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.*;
-
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
+
+import com.voilandPantry.models.Inventory;
+import com.voilandPantry.repositories.InventoryRepository;
 
 @Controller
 public class InventoryController {
@@ -52,6 +58,23 @@ public class InventoryController {
         updatedItem.setId(id);
         inventoryRepository.save(updatedItem);
         return "redirect:/inventory";
+    }
+
+    // Update endpoint for JSON requests: accepts JSON with inventory fields
+    @PostMapping(path = "/inventory/{id}", consumes = "application/json", produces = "application/json")
+    @ResponseBody
+    public ResponseEntity<Map<String, Object>> updateInventoryJson(@PathVariable Long id, @RequestBody Inventory updatedItem) {
+        Optional<Inventory> optional = inventoryRepository.findById(id);
+        if (optional.isEmpty()) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(Map.of("status", "not_found", "message", "Inventory item not found"));
+        }
+        Inventory item = optional.get();
+        item.setUpc(updatedItem.getUpc());
+        item.setProductName(updatedItem.getProductName());
+        item.setNetWeight(updatedItem.getNetWeight());
+        item.setQuantity(updatedItem.getQuantity());
+        inventoryRepository.save(item);
+        return ResponseEntity.ok(Map.of("status", "ok", "message", "Item updated successfully"));
     }
 
     // Checkout endpoint: accepts JSON { "code": "<UPC>" }
