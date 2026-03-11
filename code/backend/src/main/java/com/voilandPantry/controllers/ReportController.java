@@ -1,11 +1,11 @@
 package com.voilandPantry.controllers;
 
-import com.voilandPantry.models.Inventory;
-import com.voilandPantry.models.Student;
-import com.voilandPantry.models.Visit;
-import com.voilandPantry.repositories.InventoryRepository;
-import com.voilandPantry.repositories.VisitRepository;
-import com.voilandPantry.services.ReportPdfService;
+import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
@@ -13,9 +13,14 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 
-import java.util.*;
-import java.util.stream.Collectors;
+import com.voilandPantry.models.Inventory;
+import com.voilandPantry.models.Student;
+import com.voilandPantry.models.Visit;
+import com.voilandPantry.repositories.InventoryRepository;
+import com.voilandPantry.repositories.VisitRepository;
+import com.voilandPantry.services.ReportPdfService;
 
 @Controller
 public class ReportController {
@@ -33,14 +38,12 @@ public class ReportController {
     }
 
     /**
-     * Compute most popular item per major.
+     * Compute most popular item per major, filtered by date range.
      */
-    private List<Object[]> computeItemsByMajor() {
+    private List<Object[]> computeItemsByMajor(List<Visit> filteredVisits) {
         Map<String, Map<String, Integer>> majorItemCounts = new HashMap<>();
 
-        List<Visit> allVisits = visitRepository.findAll();
-
-        for (Visit visit : allVisits) {
+        for (Visit visit : filteredVisits) {
             Student student = visit.getStudent();
             if (student == null || visit.getItems() == null || visit.getItems().isEmpty()) continue;
 
@@ -77,14 +80,12 @@ public class ReportController {
     }
 
     /**
-     * Compute item counts per month.
+     * Compute item counts per month, filtered by date range.
      */
-    private List<Object[]> computeItemsPerMonth() {
+    private List<Object[]> computeItemsPerMonth(List<Visit> filteredVisits) {
         Map<Integer, Map<String, Integer>> monthItemCounts = new HashMap<>();
 
-        List<Visit> allVisits = visitRepository.findAll();
-
-        for (Visit visit : allVisits) {
+        for (Visit visit : filteredVisits) {
             if (visit.getItems() == null || visit.getItems().isEmpty() || visit.getTimestamp() == null) continue;
 
             int month = visit.getTimestamp().getMonthValue();
@@ -114,10 +115,86 @@ public class ReportController {
     }
 
     /**
+     * Compute total weight of food given out by major
+     */
+    private List<Object[]> computeTotalWeightByMajor(List<Visit> filteredVisits) {
+        Map<String, Double> majorWeightMap = new HashMap<>();
+        List<Inventory> allInventory = inventoryRepository.findAll();
+
+        for (Visit visit : filteredVisits) {
+            Student student = visit.getStudent();
+            if (student == null || visit.getItems() == null || visit.getItems().isEmpty()) continue;
+
+            String major = student.getMajor();
+            majorWeightMap.putIfAbsent(major, 0.0);
+            String[] itemsArray = visit.getItems().split(",");
+            for (String itemName : itemsArray) {
+                String trimmedItem = itemName.trim();
+                if (!trimmedItem.isEmpty()) {
+                    // Find the inventory item by product name
+                    String queryItem = trimmedItem;
+                    Inventory inventoryItem = allInventory.stream()
+                            .filter(inv -> inv.getProductName().equalsIgnoreCase(queryItem))
+                            .findFirst()
+                            .orElse(null);
+
+                    if (inventoryItem != null) {
+                        Double weight = inventoryItem.getNetWeight();
+                        if (weight > 0) {
+                            majorWeightMap.put(major, majorWeightMap.get(major) + weight);
+                        }
+                    }
+                }
+            }
+        }
+
+        List<Object[]> result = new ArrayList<>();
+        double totalWeight = 0.0;
+        for (Map.Entry<String, Double> entry : majorWeightMap.entrySet()) {
+            result.add(new Object[]{entry.getKey(), String.format("%.2f", entry.getValue())});
+            totalWeight += entry.getValue();
+        }
+        // Add overall total at the end
+        result.add(new Object[]{"TOTAL", String.format("%.2f", totalWeight)});
+
+        return result;
+    }
+
+    /**
+     * Filter visits by date range
+     */
+    private List<Visit> filterVisitsByDateRange(LocalDate startDate, LocalDate endDate) {
+        List<Visit> allVisits = visitRepository.findAll();
+        
+        return allVisits.stream().filter(visit -> {
+            if (visit.getTimestamp() == null) return false;
+            LocalDate visitDate = visit.getTimestamp().toLocalDate();
+            
+            // If both dates provided
+            if (startDate != null && endDate != null) {
+                return !visitDate.isBefore(startDate) && !visitDate.isAfter(endDate);
+            }
+            // If only start date provided
+            else if (startDate != null) {
+                return !visitDate.isBefore(startDate);
+            }
+            // If only end date provided
+            else if (endDate != null) {
+                return !visitDate.isAfter(endDate);
+            }
+            // If neither provided, include all
+            return true;
+        }).collect(Collectors.toList());
+    }
+
+    /**
      * Gather all report data for HTML or PDF
      */
-    private Map<String, Object> getReportDataMap() {
+    private Map<String, Object> getReportDataMap(LocalDate startDate, LocalDate endDate) {
         Map<String, Object> data = new HashMap<>();
+
+        // Filter visits by date range
+        List<Visit> filteredVisits = filterVisitsByDateRange(startDate, endDate);
 
         List<Inventory> inventoryList = inventoryRepository.findAll();
         int totalItems = inventoryList.stream().mapToInt(Inventory::getQuantity).sum();
@@ -126,29 +203,66 @@ public class ReportController {
         data.put("inventoryList", inventoryList);
         data.put("totalItems", totalItems);
         data.put("lowStockCount", lowStockCount);
+        data.put("startDate", startDate);
+        data.put("endDate", endDate);
 
-        // Visits summary by major
-        data.put("visitsByMajor", visitRepository.visitsByMajor());
+        // Visits summary by major (filtered)
+        // Need to compute this from filteredVisits
+        Map<String, Long> visitsByMajorMap = filteredVisits.stream()
+                .filter(v -> v.getStudent() != null && v.getStudent().getMajor() != null)
+                .collect(Collectors.groupingBy(v -> v.getStudent().getMajor(), Collectors.counting()));
+        
+        List<Object[]> visitsByMajor = visitsByMajorMap.entrySet().stream()
+                .map(e -> new Object[]{e.getKey(), e.getValue()})
+                .collect(Collectors.toList());
+        
+        data.put("visitsByMajor", visitsByMajor);
 
-        // Popular items by major
-        data.put("itemsByMajor", computeItemsByMajor());
+        // Popular items by major (filtered)
+        data.put("itemsByMajor", computeItemsByMajor(filteredVisits));
 
-        // Items per month
-        data.put("itemsPerMonth", computeItemsPerMonth());
+        // Items per month (filtered)
+        data.put("itemsPerMonth", computeItemsPerMonth(filteredVisits));
+
+        // Total weight by major (filtered)
+        data.put("weightByMajor", computeTotalWeightByMajor(filteredVisits));
 
         return data;
     }
 
     @GetMapping("/report")
-    public String reportPage(Model model) {
-        model.addAllAttributes(getReportDataMap());
+    public String reportPage(@RequestParam(required = false) String startDate,
+                             @RequestParam(required = false) String endDate,
+                             Model model) {
+        LocalDate start = null;
+        LocalDate end = null;
+        
+        if (startDate != null && !startDate.isEmpty()) {
+            start = LocalDate.parse(startDate);
+        }
+        if (endDate != null && !endDate.isEmpty()) {
+            end = LocalDate.parse(endDate);
+        }
+        
+        model.addAllAttributes(getReportDataMap(start, end));
         return "report";
     }
 
     @GetMapping("/report/download")
-    public ResponseEntity<byte[]> downloadReport() {
+    public ResponseEntity<byte[]> downloadReport(@RequestParam(required = false) String startDate,
+                                                  @RequestParam(required = false) String endDate) {
+        LocalDate start = null;
+        LocalDate end = null;
+        
+        if (startDate != null && !startDate.isEmpty()) {
+            start = LocalDate.parse(startDate);
+        }
+        if (endDate != null && !endDate.isEmpty()) {
+            end = LocalDate.parse(endDate);
+        }
+        
         // Use separate PDF template
-        byte[] pdfBytes = pdfService.generatePdfFromHtml("report-pdf", getReportDataMap());
+        byte[] pdfBytes = pdfService.generatePdfFromHtml("report-pdf", getReportDataMap(start, end));
 
         return ResponseEntity.ok()
                 .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=Pantry_Report.pdf")

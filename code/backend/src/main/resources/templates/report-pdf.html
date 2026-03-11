@@ -18,6 +18,24 @@
 <h1>Voiland Food Pantry</h1>
 <h2>Pantry Analytics Report</h2>
 
+<!-- DATE RANGE DISPLAY -->
+<div style="text-align: center; margin-bottom: 20px; padding: 10px; border: 1px solid #ccc;">
+    <p style="margin: 0;">
+        <span th:if="${startDate != null and endDate != null}">
+            Report for <strong th:text="${startDate}"></strong> to <strong th:text="${endDate}"></strong>
+        </span>
+        <span th:if="${startDate != null and endDate == null}">
+            Report from <strong th:text="${startDate}"></strong> onwards
+        </span>
+        <span th:if="${startDate == null and endDate != null}">
+            Report up to <strong th:text="${endDate}"></strong>
+        </span>
+        <span th:if="${startDate == null and endDate == null}">
+            Report for all records
+        </span>
+    </p>
+</div>
+
 <p>Total Inventory Items: <span th:text="${totalItems}">0</span></p>
 <p>Low Stock Items (<span th:text="${lowStockCount}">0</span>):</p>
 <ul>
@@ -55,6 +73,17 @@
     <td th:text="${T(java.time.Month).of(row[0]).name()}"></td>
     <td th:text="${row[1]}"></td>
     <td th:text="${row[2]}"></td>
+</tr>
+</tbody>
+</table>
+
+<h3>Total Weight of Food Given Out by Major</h3>
+<table>
+<thead><tr><th>Major</th><th>Total Weight (oz)</th></tr></thead>
+<tbody>
+<tr th:each="row : ${weightByMajor}">
+    <td th:text="${row[0]}"></td>
+    <td th:text="${row[1]}"></td>
 </tr>
 </tbody>
 </table>

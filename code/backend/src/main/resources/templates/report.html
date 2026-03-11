@@ -139,12 +139,46 @@
     <div class="header-buttons">
         <button onclick="window.location.href='/admin/dashboard'">Dashboard</button>
         <button onclick="window.location.href='/inventory'">Inventory</button>
-        <button onclick="window.location.href='/report/download'">Download PDF</button>
+        <button onclick="downloadReportWithDates()">Download PDF</button>
     </div>
 </header>
 
 <div class="main-content">
     <h2>Pantry Analytics Report</h2>
+
+    <!-- DATE RANGE DISPLAY -->
+    <div style="background: #f0f0f0; padding: 15px; border-radius: 8px; margin-bottom: 20px; text-align: center;">
+        <p style="margin: 0; color: #666;">
+            <span th:if="${startDate != null and endDate != null}">
+                Report for <strong th:text="${startDate}"></strong> to <strong th:text="${endDate}"></strong>
+            </span>
+            <span th:if="${startDate != null and endDate == null}">
+                Report from <strong th:text="${startDate}"></strong> onwards
+            </span>
+            <span th:if="${startDate == null and endDate != null}">
+                Report up to <strong th:text="${endDate}"></strong>
+            </span>
+            <span th:if="${startDate == null and endDate == null}">
+                Report for all records
+            </span>
+        </p>
+    </div>
+
+    <!-- DATE FILTER -->
+    <div style="background: white; padding: 20px; border-radius: 8px; margin-bottom: 30px; box-shadow: 0 2px 6px rgba(0,0,0,0.05);">
+        <form method="get" action="/report" style="display: flex; gap: 20px; flex-wrap: wrap; align-items: flex-end;">
+            <div style="display: flex; flex-direction: column;">
+                <label for="startDate" style="margin-bottom: 5px; font-weight: bold; color: #333;">Timeframe Start Date</label>
+                <input type="date" id="startDate" name="startDate" th:value="${startDate}" style="padding: 8px; border: 1px solid #ccc; border-radius: 4px;">
+            </div>
+            <div style="display: flex; flex-direction: column;">
+                <label for="endDate" style="margin-bottom: 5px; font-weight: bold; color: #333;">Timeframe End Date</label>
+                <input type="date" id="endDate" name="endDate" th:value="${endDate}" style="padding: 8px; border: 1px solid #ccc; border-radius: 4px;">
+            </div>
+            <button type="submit" style="padding: 8px 16px; background-color: #db3434; color: white; border: none; border-radius: 4px; cursor: pointer; font-weight: bold;">Filter Report</button>
+            <button type="button" onclick="window.location.href='/report'" style="padding: 8px 16px; background-color: #95a5a6; color: white; border: none; border-radius: 4px; cursor: pointer;">Clear Filters</button>
+        </form>
+    </div>
 
     <!-- SUMMARY CARDS -->
     <div class="summary-box">
@@ -211,6 +245,22 @@
         </table>
     </div>
 
+    <!-- TOTAL WEIGHT BY MAJOR -->
+    <div class="report-section">
+        <h3>Total Weight of Food Given Out by Major</h3>
+        <table>
+            <thead>
+                <tr><th>Major</th><th>Total Weight (oz)</th></tr>
+            </thead>
+            <tbody>
+                <tr th:each="row : ${weightByMajor}">
+                    <td th:text="${row[0]}">Major</td>
+                    <td th:text="${row[1]}">0</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
     <!-- FULL INVENTORY -->
     <div class="report-section">
         <h3>Full Inventory Details</h3>
@@ -230,6 +280,29 @@
     </div>
 
 </div> <!-- .main-content -->
+
+<script>
+function downloadReportWithDates() {
+    const startDate = document.getElementById('startDate').value;
+    const endDate = document.getElementById('endDate').value;
+    
+    let url = '/report/download';
+    const params = new URLSearchParams();
+    
+    if (startDate) {
+        params.append('startDate', startDate);
+    }
+    if (endDate) {
+        params.append('endDate', endDate);
+    }
+    
+    if (params.toString()) {
+        url += '?' + params.toString();
+    }
+    
+    window.location.href = url;
+}
+</script>
 
 </body>
 </html>
