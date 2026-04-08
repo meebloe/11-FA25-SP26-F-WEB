@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+<meta charset="UTF-8">
+<title>Volunteer Dashboard - Voiland Food Pantry</title>
+
+<link rel="stylesheet" href="/css/style.css">
+
+<style>
+body {
+    font-family: "Arial", sans-serif;
+    margin: 0;
+    background-color: #f5f6fa;
+    color: #333;
+}
+
+/* HEADER */
+header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 15px 20px;
+    background-color: #fff;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+}
+
+.header-left {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+header img { height: 60px; }
+
+header h1 {
+    font-size: 24px;
+    color: #502c2c;
+    cursor: pointer;
+}
+
+/* USER DROPDOWN */
+.user-menu {
+    position: relative;
+}
+
+.user-name {
+    cursor: pointer;
+    font-weight: bold;
+    color: #502c2c;
+}
+
+.dropdown {
+    display: none;
+    position: absolute;
+    right: 0;
+    top: 30px;
+    background: white;
+    border-radius: 6px;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+    overflow: hidden;
+}
+
+.dropdown a {
+    display: block;
+    padding: 10px 15px;
+    text-decoration: none;
+    color: #333;
+}
+
+.dropdown a:hover {
+    background-color: #f1f1f1;
+}
+
+/* MAIN */
+.main-content {
+    max-width: 800px;
+    margin: 0px auto;
+    padding: 0 20px;
+    text-align: center;
+}
+
+h2 {
+    color: #502c2c;
+    margin-bottom: 30px;
+}
+
+/* BUTTON ROW */
+.dashboard-buttons {
+    display: flex;
+    justify-content: center;
+    gap: 20px;
+    flex-wrap: wrap;
+}
+
+/* BUTTON STYLE */
+.dashboard-buttons a {
+    padding: 14px 24px;
+    background-color: #db3434;
+    color: white;
+    text-decoration: none;
+    border-radius: 6px;
+    font-weight: bold;
+    transition: 0.2s;
+}
+
+.dashboard-buttons a:hover {
+    background-color: #b92929;
+}
+
+/* SECONDARY BUTTON */
+.secondary {
+    background-color: #95a5a6 !important;
+}
+
+.secondary:hover {
+    background-color: #7f8c8d !important;
+}
+</style>
+</head>
+
+<body>
+
+<header>
+    <div class="header-left">
+        <img src="/images/cougar_mock-up.png">
+        <h1 onclick="window.location.href='/'">Voiland Food Pantry</h1>
+    </div>
+
+    <div class="user-menu">
+        <div class="user-name" onclick="toggleDropdown()">
+            <span th:text="${name}"></span>
+        </div>
+
+        <div id="dropdown" class="dropdown">
+            <a href="/volunteer/logout">Sign Out</a>
+        </div>
+    </div>
+</header>
+
+<div class="main-content">
+
+<h2>Volunteer Dashboard</h2>
+
+<div class="dashboard-buttons">
+    <a href="/volunteer/hours">Submit Hours</a>
+    <a href="/inventory" class="secondary">View Inventory</a>
+</div>
+
+</div>
+
+<script>
+function toggleDropdown() {
+    const menu = document.getElementById("dropdown");
+    menu.style.display = menu.style.display === "block" ? "none" : "block";
+}
+
+// close dropdown if clicking outside
+window.onclick = function(event) {
+    if (!event.target.closest('.user-menu')) {
+        document.getElementById("dropdown").style.display = "none";
+    }
+}
+</script>
+
+</body>
+</html>
