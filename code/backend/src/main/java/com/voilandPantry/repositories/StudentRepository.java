@@ -1,9 +1,19 @@
 package com.voilandPantry.repositories;
 
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import com.voilandPantry.models.Student;
+import java.util.List;
 import java.util.Optional;
 
 public interface StudentRepository extends JpaRepository<Student, Long> {
-    Optional<Student> findByIdentifier(String identifier);
+    List<Student> findAll();
+    
+    default Optional<Student> findByHashedIdentifier(String plainIdentifier) {
+        BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
+        List<Student> students = findAll();
+        return students.stream()
+                .filter(student -> encoder.matches(plainIdentifier, student.getIdentifier()))
+                .findFirst();
+    }
 }

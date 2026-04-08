@@ -3,6 +3,7 @@ package com.voilandPantry.controllers;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -17,6 +18,8 @@ public class LoginController {
 
     @Autowired
     private StudentRepository studentRepository;
+    
+    private BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
 
     @GetMapping("/login")
     public String showLoginPage() {
@@ -30,8 +33,8 @@ public class LoginController {
         // Debug logging
         System.out.println("DEBUG: Login attempt with identifier = " + identifier);
 
-        // Find the student in MySQL
-        Optional<Student> studentOpt = studentRepository.findByIdentifier(identifier);
+        // Find the student in MySQL by comparing hashed identifiers
+        Optional<Student> studentOpt = studentRepository.findByHashedIdentifier(identifier);
 
         if (studentOpt.isPresent()) {
             // REDIRECT to the welcome URL so VisitController can save the visit to MySQL
@@ -55,8 +58,9 @@ public class LoginController {
         System.out.println("DEBUG: Register attempt with identifier = " + identifier);
         System.out.println("DEBUG: Year = " + year + ", Major = " + major);
         
-        // 1. Create and save the new student
-        Student newStudent = new Student(identifier, year, major);
+        // 1. Hash the identifier and create the new student
+        String hashedIdentifier = passwordEncoder.encode(identifier);
+        Student newStudent = new Student(hashedIdentifier, year, major);
         newStudent = studentRepository.save(newStudent); // Capture the saved student to get the ID
         
         System.out.println("DEBUG: New student registered with ID = " + newStudent.getId());
