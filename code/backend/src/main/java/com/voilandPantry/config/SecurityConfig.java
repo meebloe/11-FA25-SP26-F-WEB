@@ -24,8 +24,8 @@ public class SecurityConfig {
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http
             .authorizeHttpRequests(auth -> auth
-                .requestMatchers("/", "/home", "/login", "/register_student", "/register", "/guest-login", "/welcome", "/end-visit", "/css/**", "/images/**", "/sounds/**", "/inventory/checkout", "/volunteer/**").permitAll()
-                .requestMatchers("/admin/**", "/inventory", "/card-reader", "/volunteer-form", "/report", "/report/download").hasRole("ADMIN")
+                .requestMatchers("/", "/home", "/login", "/register_student", "/register", "/guest-login", "/welcome", "/end-visit", "/css/**", "/images/**", "/sounds/**", "/inventory", "/inventory/checkout", "/volunteer/**").permitAll()
+                .requestMatchers("/admin/**", "/card-reader", "/volunteer-form", "/report", "/report/download").hasRole("ADMIN")
                 .anyRequest().authenticated()
             )
 
@@ -46,7 +46,7 @@ public class SecurityConfig {
 
             .sessionManagement(session -> session
                 .sessionFixation().migrateSession()
-                .invalidSessionUrl("/admin-login")
+                .invalidSessionUrl("/")
                 .maximumSessions(1)
                 .maxSessionsPreventsLogin(false)
             )

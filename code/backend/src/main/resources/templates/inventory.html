@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<html lang="en" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -51,7 +51,8 @@
     <button type="button" onclick="openScanInPopup()" style="margin-left: 10px;">Scan In</button>
 
     <div class="back-btn-wrapper">
-        <button onclick="window.location.href='/admin/dashboard'">Back to Dashboard</button>
+        <button sec:authorize="hasRole('ADMIN')" onclick="window.location.href='/admin/dashboard'">Back to Dashboard</button>
+        <button sec:authorize="!hasRole('ADMIN')" onclick="window.location.href='/volunteer/dashboard'">Back to Dashboard</button>
     </div>
 </div>
 
