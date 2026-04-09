@@ -1,10 +1,12 @@
 package com.voilandPantry.repositories;
 
-import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
-import com.voilandPantry.models.Student;
 import java.util.List;
 import java.util.Optional;
+
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+
+import com.voilandPantry.models.Student;
 
 public interface StudentRepository extends JpaRepository<Student, Long> {
     List<Student> findAll();

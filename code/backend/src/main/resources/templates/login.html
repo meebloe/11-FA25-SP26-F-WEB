@@ -13,7 +13,7 @@
 </header>
 
 <div class="main-content">
-    <!-- Login Popup -->
+    <!-- Card Login Popup -->
     <div id="loginPopup" style="position: fixed; left: 50%; top: 50%; transform: translate(-50%, -50%); 
         background-color: white; padding: 40px; border: 1px solid #ccc; box-shadow: 0 0 10px rgba(0,0,0,0.5); 
         z-index: 1000; text-align: center; min-width: 400px; border-radius: 8px;">
@@ -21,6 +21,40 @@
         <p style="font-size: 18px; color: #666; margin: 20px 0;">Please swipe your Cougar Card</p>
         <form id="loginForm" method="POST" action="/login">
             <input type="text" id="identifier" name="identifier" autofocus style="opacity: 0; width: 0; height: 0; padding: 0; border: none; position: absolute;">
+        </form>
+        <button type="button" onclick="showGuestLogin()" style="margin-top: 30px; padding: 12px 20px; background-color: #A60F2D; color: white; border: none; border-radius: 4px; cursor: pointer; font-size: 14px; text-decoration: underline;">
+            Don't have your Cougar Card? Click here.
+        </button>
+    </div>
+
+    <!-- Guest Login Popup -->
+    <div id="guestLoginPopup" style="display: none; position: fixed; left: 50%; top: 50%; transform: translate(-50%, -50%); 
+        background-color: white; padding: 40px; border: 1px solid #ccc; box-shadow: 0 0 10px rgba(0,0,0,0.5); 
+        z-index: 1000; text-align: center; min-width: 400px; border-radius: 8px;">
+        <h2>Guest Sign-In</h2>
+        <p style="font-size: 16px; color: #666; margin: 20px 0;">Please enter your information</p>
+        <form id="guestLoginForm" method="POST" action="/guest-login">
+            <div style="margin: 15px 0;">
+                <label for="guestYear" style="display: block; margin-bottom: 5px; font-weight: bold;">Year:</label>
+                <select id="guestYear" name="year" required style="width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 4px; margin-bottom: 15px;">
+                    <option value="">-- Select Year --</option>
+                    <option value="Freshman">Freshman</option>
+                    <option value="Sophomore">Sophomore</option>
+                    <option value="Junior">Junior</option>
+                    <option value="Senior">Senior</option>
+                    <option value="Other">Other</option>
+                </select>
+            </div>
+            <div style="margin: 15px 0;">
+                <label for="guestMajor" style="display: block; margin-bottom: 5px; font-weight: bold;">Major:</label>
+                <input type="text" id="guestMajor" name="major" placeholder="e.g., Computer Science" required style="width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 4px; box-sizing: border-box;">
+            </div>
+            <button type="submit" style="margin-top: 20px; margin-right: 10px; padding: 10px 20px; background-color: #A60F2D; color: white; border: none; border-radius: 4px; cursor: pointer; font-size: 14px;">
+                Continue as Guest
+            </button>
+            <button type="button" onclick="hideGuestLogin()" style="margin-top: 20px; padding: 10px 20px; background-color: #666; color: white; border: none; border-radius: 4px; cursor: pointer; font-size: 14px;">
+                Back to Card Login
+            </button>
         </form>
     </div>
 
@@ -48,6 +82,18 @@ function handleLogin() {
 
         // Clear the input field for next swipe
     document.getElementById('identifier').value = '';
+}
+
+function showGuestLogin() {
+    document.getElementById('loginPopup').style.display = 'none';
+    document.getElementById('guestLoginPopup').style.display = 'block';
+    document.getElementById('guestYear').focus();
+}
+
+function hideGuestLogin() {
+    document.getElementById('guestLoginPopup').style.display = 'none';
+    document.getElementById('loginPopup').style.display = 'block';
+    document.getElementById('identifier').focus();
 }
 
 document.addEventListener('DOMContentLoaded', () => {
