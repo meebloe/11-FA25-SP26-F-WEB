@@ -88,11 +88,8 @@ public class LoginController {
         System.out.println("DEBUG: Register attempt with identifier = " + identifier);
         System.out.println("DEBUG: Year = " + year + ", Major = " + major);
         
-        // 1. Hash the identifier with SHA-256 first to normalize it (handles long card swipe data)
-        // This SHA-256 hash will be at most 64 bytes (256 bits in hex), well under BCrypt's 72-byte limit
-        String normalizedIdentifier = hashIdentifierWithSHA256(identifier);
-        String hashedIdentifier = passwordEncoder.encode(normalizedIdentifier);
-        Student newStudent = new Student(hashedIdentifier, year, major);
+        // 1. Hash the identifier with SHA-256 (deterministic hash for card identifiers)
+        Student newStudent = new Student(identifier, year, major);
         newStudent = studentRepository.save(newStudent); // Capture the saved student to get the ID
         
         System.out.println("DEBUG: New student registered with ID = " + newStudent.getId());
@@ -113,9 +110,8 @@ public class LoginController {
         String trivialIdentifier = "GUEST_" + UUID.randomUUID().toString();
         System.out.println("DEBUG: Generated trivial identifier = " + trivialIdentifier);
         
-        // 2. Hash the identifier with SHA-256 first, then BCrypt
-        String normalizedIdentifier = hashIdentifierWithSHA256(trivialIdentifier);
-        String hashedIdentifier = passwordEncoder.encode(normalizedIdentifier);
+        // 2. Hash the identifier with SHA-256 (deterministic hash for card identifiers)
+        String hashedIdentifier = hashIdentifierWithSHA256(trivialIdentifier);
         Student guestStudent = new Student(hashedIdentifier, year, major);
         guestStudent = studentRepository.save(guestStudent); // Capture the saved student to get the ID
         
