@@ -40,6 +40,7 @@
         /* Welcome message */
         .welcome-msg {
             font-size: 1.2em;
+            margin-top: 40px;
             margin-bottom: 40px;
             text-align: center;
         }
@@ -137,13 +138,23 @@
         <p>Welcome, <span sec:authentication="name">Admin</span>! You now have full access to the Admin Dashboard.</p>
     </div>
 
-    <div class="dashboard-buttons">
-        <button onclick="window.location.href='/inventory'">Inventory</button>
-        <button onclick="window.location.href='/volunteer-form'">Volunteer Form <span style="color: #e74c3c; font-size: 0.9em;">(INCOMPLETE)</span></button>
-        <button onclick="window.location.href='/report'">Report</button>
-        <!-- New Back to Home button -->
-        <button onclick="window.location.href='/'">Back to Home</button>
-    </div>
+<div class="dashboard-buttons">
+    <button onclick="window.location.href='/inventory'">Inventory</button>
+
+    <button onclick="window.location.href='/report'">
+         Inventory Report
+    </button>
+
+    <button onclick="window.location.href='/admin/volunteer-report'">
+         Volunteer Hours Report
+    </button>
+
+    <button onclick="window.location.href='/admin/volunteers'">
+     Manage Volunteers
+    </button>
+
+    <button onclick="window.location.href='/'">Back to Home</button>
+</div>
 
     <div class="admin-form">
         <h2 style="text-align:center;">Add New Admin</h2>

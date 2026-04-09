@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+<meta charset="UTF-8">
+<title>Volunteer Report PDF</title>
+
+<style>
+    body {
+        font-family: Arial, sans-serif;
+        margin: 20px;
+        color: #333;
+    }
+
+    h1, h2 {
+        text-align: center;
+        color: #502c2c;
+    }
+
+    table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-top: 20px;
+    }
+
+    th, td {
+        border: 1px solid #db3434;
+        padding: 8px;
+    }
+
+    th {
+        background-color: #db3434;
+        color: white;
+    }
+</style>
+</head>
+
+<body>
+
+<h1>Voiland Food Pantry</h1>
+<h2>Volunteer Hours Report</h2>
+
+<div style="text-align: center; margin-bottom: 20px;">
+    <span th:if="${startDate != null and endDate != null}">
+        Report for <strong th:text="${startDate}"></strong> to <strong th:text="${endDate}"></strong>
+    </span>
+</div>
+
+<table>
+<tr>
+    <th>Name</th>
+    <th>Email</th>
+    <th>Total Hours</th>
+</tr>
+
+<tr th:each="v : ${volunteers}">
+    <td th:text="${v.name}"></td>
+    <td th:text="${v.email}"></td>
+    <td th:text="${totals[v.id] != null ? totals[v.id] : 0}"></td>
+</tr>
+</table>
+
+</body>
+</html>

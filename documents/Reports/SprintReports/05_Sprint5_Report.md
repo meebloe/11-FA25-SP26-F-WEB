@@ -1,6 +1,6 @@
-# Sprint x Report (START DATE to 3/15/26)
+# Sprint 5 Report (2/15/26 to 3/15/26)
 
-## YouTube link of Sprint * Video (Make this video unlisted)
+## [YouTube link of Sprint 5 Video](https://www.youtube.com/watch?v=cFabowBw-w8)
 
 ## What's New (User Facing)
  * Admin Users can edit existing entries in the inventory table (UPC Code, Product, Net Weight, or Quantity)
@@ -16,49 +16,31 @@ We were not yet able to implement a couple features. First of all, we still plan
 ## Completed Issues/User Stories
 Here are links to the issues that we completed in this sprint:
 
- * URL of issue 1
- * URL of issue 2
- * URL of issue n
-
- Reminders (Remove this section when you save the file):
-  * Each issue should be assigned to a milestone
-  * Each completed issue should be assigned to a pull request
-  * Each completed pull request should include a link to a "Before and After" video
-  * All team members who contributed to the issue should be assigned to it on GitHub
-  * Each issue should be assigned story points using a label
-  * Story points contribution of each team member should be indicated in a comment
+ * [Inventory functionality](https://github.com/meebloe/11-FA25-SP26-F-WEB/issues/11)
+ * [Integrate hardware tools](https://github.com/meebloe/11-FA25-SP26-F-WEB/issues/10)
  
  ## Incomplete Issues/User Stories
  Here are links to issues we worked on but did not complete in this sprint:
  
- * URL of issue 1 <<One sentence explanation of why issue was not completed>>
- * URL of issue 2 <<One sentence explanation of why issue was not completed>>
- * URL of issue n <<One sentence explanation of why issue was not completed>>
- 
- Examples of explanations (Remove this section when you save the file):
-  * "We ran into a complication we did not anticipate (explain briefly)." 
-  * "We decided that the feature did not add sufficient value for us to work on it in this sprint (explain briefly)."
-  * "We could not reproduce the bug" (explain briefly).
-  * "We did not get to this issue because..." (explain briefly)
+ * [Volunteer features](https://github.com/meebloe/11-FA25-SP26-F-WEB/issues/19)<br>
+   We were unable to complete this issue due to focusing on system deployment and related research.
+ * [HTML Mockup](https://github.com/meebloe/11-FA25-SP26-F-WEB/issues/6)<br>
+   We were unable to complete UI improvements to the HTML mockup due to a member of the team falling ill.  
 
 ## Code Files for Review
 Please review the following code files, which were actively developed during this sprint, for quality:
- * [Name of code file 1](https://github.com/your_repo/file_extension)
- * [Name of code file 2](https://github.com/your_repo/file_extension)
- * [Name of code file 3](https://github.com/your_repo/file_extension)
+ * [System deployment](https://github.com/meebloe/11-FA25-SP26-F-WEB/tree/Sprint5-PREDEPLOYMENT/code/backend/src/main/java/com/voilandPantry)
  
 ## Retrospective Summary
 Here's what went well:
-  * Item 1
-  * Item 2
-  * Item x
+  * System successfully deployed on client's hardware
+  * Researched potential method to ensure system scalability
  
 Here's what we'd like to improve:
-   * Item 1
-   * Item 2
-   * Item x
+   * Meet with clients more often, especially since we are nearing the end of the semester
+   * Complete assigned tasks in given timeframes 
   
 Here are changes we plan to implement in the next sprint:
-   * Item 1
-   * Item 2
-   * Item x
+   * Changes according to client feedback after system deployment
+   * Accessibility improvements for UI
+   * Total feature completion 
