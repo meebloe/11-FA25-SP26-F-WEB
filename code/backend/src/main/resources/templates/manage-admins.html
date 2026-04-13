@@ -1,0 +1,271 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="/css/style.css">
+    <title>Manage Admin Accounts</title>
+
+    <style>
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px 30px;
+        }
+        header img {
+            height: 80px;
+        }
+        header h1 {
+            margin-left: 15px;
+            cursor: pointer;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 60px auto;
+            padding: 0 20px;
+        }
+
+        .box {
+            background: #fafafa;
+            padding: 25px;
+            border-radius: 10px;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+            margin-bottom: 40px;
+        }
+
+        h2 {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            margin-top: 15px;
+            font-weight: bold;
+            text-align: center;
+        }
+
+        input {
+            width: 100%;
+            padding: 10px;
+            margin-top: 5px;
+            border-radius: 5px;
+            border: 1px solid #aaa;
+            display: block;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        button {
+            width: 90%;
+            padding: 12px;
+            margin-top: 20px;
+            border: none;
+            border-radius: 5px;
+            background-color: #8b0000;
+            color: white;
+            font-size: 16px;
+            cursor: pointer;
+            transition: background-color .2s ease;
+        }
+        button:hover {
+            background-color: #a30000;
+        }
+
+        /* Table styling */
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 15px;
+        }
+        th, td {
+            padding: 12px;
+            border-bottom: 1px solid #ddd;
+            text-align: center;
+        }
+        th {
+            background-color: #eee;
+        }
+
+        .action-btn {
+            padding: 8px 15px;
+            font-size: 0.9em;
+            border-radius: 5px;
+            border: none;
+            cursor: pointer;
+            background-color: #8b0000;
+            color: white;
+        }
+        .action-btn:hover {
+            background-color: #a30000;
+        }
+
+        /* Modal popup */
+        .modal-bg {
+            display: none;
+            position: fixed;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            background: rgba(0,0,0,0.5);
+            justify-content: center;
+            align-items: center;
+        }
+        .modal-box {
+            background: #fafafa;
+            padding: 25px;
+            border-radius: 10px;
+            width: 350px;
+            text-align: center;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+        }
+        /* 1. Make the form container wider to allow for longer inputs */
+        .admin-form {
+            width: 100%;
+            max-width: 600px; /* Increased from 500px to allow more room */
+            margin: 0 auto;
+            display: flex;
+            flex-direction: column;
+            align-items: center; 
+        }
+
+        /* 2. Revert to space-between to push label left and input right */
+        .form-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between; 
+            margin-bottom: 15px;
+            width: 100%;
+        }
+
+        /* 3. Keep a fixed width for labels so the inputs stay aligned */
+        .form-row label {
+            flex: 0 0 100px; 
+            text-align: left; /* Back to left alignment */
+            font-weight: bold;
+        }
+
+        /* 4. Make the input boxes expand to fill the remaining space */
+        .form-row input {
+            flex: 1; /* This tells the input to grow as much as possible */
+            padding: 12px;
+            border-radius: 5px;
+            border: 1px solid #aaa;
+            min-width: 300px; /* Ensures they stay "long" even on smaller screens */
+        }
+
+        /* 5. Center the button at the bottom */
+        .admin-form button {
+            width: 250px;
+            margin-top: 10px;
+            align-self: center;
+        }
+    </style>
+
+    <script>
+        function openResetModal(username) {
+            document.getElementById("reset-username").value = username;
+            document.getElementById("modal-bg").style.display = "flex";
+        }
+
+        function closeModal() {
+            document.getElementById("modal-bg").style.display = "none";
+        }
+    </script>
+</head>
+
+<body>
+
+<header>
+    <div style="display: flex; align-items: center;">
+        <img src="/images/cougar_mock-up.png" alt="WSU Logo">
+        <h1 onclick="window.location.href='/'">Voiland Food Pantry</h1>
+    </div>
+</header>
+
+<div class="container">
+
+    <!-- Add New Admin Box -->
+    <div class="box">
+        <h2>Add New Admin</h2>
+
+        <form action="/admin/add" method="post" class="admin-form">
+            <div class="form-row">
+                <label>New Admin Username:</label>
+                <input type="text" name="username" required>
+            </div>
+
+            <div class="form-row">
+                <label>New Admin Password:</label>
+                <input type="password" name="password" required>
+            </div>
+
+            <button type="submit">Add Admin</button>
+        </form>
+    </div>
+
+    <!-- Manage Existing Admins Box -->
+    <div class="box">
+        <h2>Manage Existing Admins</h2>
+
+        <table>
+            <thead>
+                <tr>
+                    <th>Username</th>
+                    <th>Reset Password</th>
+                    <th>Delete</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr th:each="admin : ${admins}">
+                    <td th:text="${admin.username}"></td>
+
+                    <!-- Only show Reset/Delete if NOT the default admin -->
+                    <td th:if="${admin.username != 'admin'}">
+                        <button class="action-btn"
+                                th:attr="data-username=${admin.username}"
+                                onclick="openResetModal(this.getAttribute('data-username'))">
+                            Reset
+                        </button>
+                    </td>
+                    <td th:if="${admin.username != 'admin'}">
+                        <form action="/admin/delete" method="post" style="margin:0;">
+                            <input type="hidden" name="username" th:value="${admin.username}">
+                            <button class="action-btn" style="background-color:#444;">
+                                Delete
+                            </button>
+                        </form>
+                    </td>
+
+                    <!-- For the default admin, show empty cells (or a note) -->
+                    <td th:if="${admin.username == 'admin'}"></td>
+                    <td th:if="${admin.username == 'admin'}"></td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <button onclick="window.location.href='/admin/dashboard'">Back to Dashboard</button>
+
+</div>
+
+<!-- Reset Password Modal -->
+<div id="modal-bg" class="modal-bg">
+    <div class="modal-box">
+        <h3>Reset Password</h3>
+
+        <form action="/admin/reset-password" method="post">
+            <input type="hidden" id="reset-username" name="username">
+
+            <label>New Password</label>
+            <input type="password" name="newPassword" required>
+
+            <button type="submit">Update Password</button>
+            <button type="button" onclick="closeModal()" style="background:#555;">Cancel</button>
+        </form>
+    </div>
+</div>
+
+</body>
+</html>

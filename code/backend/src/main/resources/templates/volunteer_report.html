@@ -2,11 +2,18 @@
 <html lang="en" xmlns:th="http://www.thymeleaf.org">
 <head>
 <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Volunteer Report - Voiland Food Pantry</title>
 
 <link rel="stylesheet" href="/css/style.css">
 
 <style>
+    /* --- BRANDING & CSS VARIABLES --- */
+    :root {
+        --wsu-crimson: #A60F2D;
+        --wsu-gray: #5e6a71;
+    }
+
     body {
         font-family: "Arial", sans-serif;
         margin: 0;
@@ -14,51 +21,47 @@
         color: #333;
     }
 
+    /* --- HEADER (Synced with Inventory/Pantry Report) --- */
     header {
         display: flex;
-        justify-content: space-between;
+        justify-content: flex-start;
         align-items: center;
         padding: 15px 30px;
         background-color: #fff;
         box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+        gap: 20px;
     }
 
     header img { height: 60px; }
 
     header h1 {
-        margin-left: 15px;
         cursor: pointer;
         font-size: 24px;
-        color: #502c2c;
+        color: #333;
+        margin: 0;
     }
 
-    .header-buttons button {
-        padding: 8px 14px;
-        border: 1px solid #502c2c;
-        border-radius: 5px;
-        background-color: #db3434;
-        color: white;
-        cursor: pointer;
-    }
-
+    /* --- MAIN CONTENT --- */
     .main-content {
         max-width: 1000px;
-        margin: 20px auto;
+        margin: 60px auto 260px auto; /* Syncs spacing for header and footer */
         padding: 0 20px;
     }
 
     h2 {
         text-align: center;
-        color: #502c2c;
+        color: #333;
         margin-bottom: 25px;
+        font-size: 28px;
     }
 
-    /* FILTER BOX */
+    /* --- FILTER BOX --- */
     .filter-box {
         background: white;
         padding: 20px;
         border-radius: 8px;
         margin-bottom: 30px;
+        border: 1px solid #ddd;
         box-shadow: 0 2px 6px rgba(0,0,0,0.05);
     }
 
@@ -69,22 +72,24 @@
         gap: 15px;
     }
 
-    /* INPUT ROW */
     .filter-inputs {
         display: flex;
         gap: 30px;
         justify-content: center;
+        flex-wrap: wrap;
     }
 
     .filter-inputs div {
         display: flex;
         flex-direction: column;
-        align-items: center;
+        align-items: flex-start;
     }
 
     label {
         margin-bottom: 5px;
         font-weight: bold;
+        font-size: 14px;
+        color: var(--wsu-gray);
     }
 
     input[type="date"] {
@@ -93,45 +98,80 @@
         border-radius: 4px;
     }
 
-    /* BUTTON ROW */
+    /* --- BUTTONS --- */
     .filter-buttons {
         display: flex;
-        gap: 15px;
+        gap: 10px;
         justify-content: center;
     }
 
     button {
         padding: 8px 16px;
-        background-color: #db3434;
-        color: white;
-        border: none;
+        background-color: #eee;
+        color: #333;
+        border: 1px solid #ccc;
         border-radius: 4px;
         cursor: pointer;
+        font-weight: normal;
+        transition: 0.2s;
     }
 
+    button:hover {
+        background-color: #ddd;
+    }
+
+    .btn-primary {
+        background-color: var(--wsu-crimson);
+        color: white;
+        border: none;
+    }
+
+    .btn-primary:hover {
+        background-color: #8a0d25;
+    }
+
+    /* --- TABLE (Synced with .inventory-table) --- */
     table {
         width: 100%;
         border-collapse: collapse;
         background: #fff;
-        border-radius: 8px;
-        overflow: hidden;
-        box-shadow: 0 2px 6px rgba(0,0,0,0.05);
+        margin-top: 10px;
     }
 
     th {
-        background-color: #db3434;
-        color: white;
+        background-color: #f2f2f2;
+        color: #333;
         padding: 12px;
         text-align: left;
+        border: 1px solid #ddd;
+        font-weight: bold;
     }
 
     td {
         padding: 12px;
-        border-bottom: 1px solid #eee;
+        border: 1px solid #ddd;
+    }
+
+    tr:nth-child(even) {
+        background-color: #fafafa;
     }
 
     tr:hover {
         background-color: #f1f1f1;
+    }
+
+    /* --- INSTRUCTION FOOTER --- */
+    .instruction-footer {
+        background-color: #f0f4f8;
+        padding: 12px 20px;
+        border-left: 4px solid var(--wsu-crimson);
+        border-radius: 4px;
+        position: fixed;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        z-index: 999;
+        box-shadow: 0 -2px 8px rgba(0,0,0,0.1);
     }
 </style>
 </head>
@@ -139,12 +179,10 @@
 <body>
 
 <header>
-    <div style="display: flex; align-items: center; gap: 10px;">
-        <img src="/images/cougar_mock-up.png">
-        <h1 onclick="window.location.href='/'">Voiland Food Pantry</h1>
-    </div>
-
-    <div class="header-buttons">
+    <img src="/images/cougar_mock-up.png" alt="Logo">
+    <h1 onclick="window.location.href='/'">Voiland Food Pantry</h1>
+    
+    <div style="margin-left: auto; display: flex; gap: 10px;">
         <button onclick="window.location.href='/admin/dashboard'">Dashboard</button>
         <button onclick="window.location.href='/report'">Pantry Report</button>
     </div>
@@ -152,52 +190,57 @@
 
 <div class="main-content">
 
-<h2>Volunteer Hours Report</h2>
+    <h2>Volunteer Hours Report</h2>
 
-<div class="filter-box">
-<form method="get" action="/admin/volunteer-report">
+    <div class="filter-box">
+        <form method="get" action="/admin/volunteer-report">
+            <div class="filter-inputs">
+                <div>
+                    <label>Start Date</label>
+                    <input type="date" name="startDate" th:value="${startDate}">
+                </div>
 
-    <!-- INPUTS -->
-    <div class="filter-inputs">
-        <div>
-            <label>Start Date</label>
-            <input type="date" name="startDate" th:value="${startDate}">
-        </div>
+                <div>
+                    <label>End Date</label>
+                    <input type="date" name="endDate" th:value="${endDate}">
+                </div>
+            </div>
 
-        <div>
-            <label>End Date</label>
-            <input type="date" name="endDate" th:value="${endDate}">
-        </div>
+            <div class="filter-buttons">
+                <button type="submit" class="btn-primary">Filter Hours</button>
+                <button type="button" onclick="downloadVolunteerReport()">Download PDF</button>
+                <button type="button" onclick="window.location.href='/admin/volunteer-report'">Clear</button>
+            </div>
+        </form>
     </div>
 
-    <!-- BUTTONS -->
-    <div class="filter-buttons">
-        <button type="submit">Filter</button>
-        <button type="button" onclick="downloadVolunteerReport()">Download PDF</button>
-    </div>
-
-</form>
-</div>
-
-<table>
-    <thead>
-        <tr>
-            <th>Name</th>
-            <th>Email</th>
-            <th>Total Hours</th>
-        </tr>
-    </thead>
-
-    <tbody>
-        <tr th:each="v : ${volunteers}">
-            <td th:text="${v.name}"></td>
-            <td th:text="${v.email}"></td>
-            <td th:text="${totals[v.id] != null ? totals[v.id] : 0}"></td>
-        </tr>
-    </tbody>
-</table>
+    <table>
+        <thead>
+            <tr>
+                <th>Name</th>
+                <th>Email</th>
+                <th>Total Hours</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr th:each="v : ${volunteers}">
+                <td th:text="${v.name}"></td>
+                <td th:text="${v.email}"></td>
+                <td th:text="${totals[v.id] != null ? totals[v.id] : 0}"></td>
+            </tr>
+            <tr th:if="${#lists.isEmpty(volunteers)}">
+                <td colspan="3" style="text-align: center; color: #999; padding: 20px;">No volunteer records found for this period.</td>
+            </tr>
+        </tbody>
+    </table>
 
 </div>
+
+<section class="instruction-footer" role="region" aria-label="Instructions">
+    <p style="margin: 0; font-size: 16px; color: #333;">
+        <strong>Volunteer Tracking:</strong> Filter by date to calculate hours for a specific period, or click <strong>Download PDF</strong> for a physical record.
+    </p>
+</section>
 
 <script>
 function downloadVolunteerReport() {

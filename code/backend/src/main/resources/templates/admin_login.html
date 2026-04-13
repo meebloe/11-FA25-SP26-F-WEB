@@ -2,25 +2,134 @@
 <html lang="en" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Admin Login</title>
     <link rel="stylesheet" href="/css/style.css">
+
+    <style>
+        /* Match home page header styling */
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px 30px;
+        }
+        header img {
+            height: 80px;
+        }
+        header h1 {
+            margin-left: 15px;
+            cursor: pointer;
+        }
+
+        /* Centered login card */
+        .login-container {
+            max-width: 450px;
+            margin: 50px auto;
+            padding: 30px;
+            border: 1px solid #ccc;
+            border-radius: 10px;
+            background: #fafafa;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+            text-align: center;
+        }
+
+        .login-container h2 {
+            margin-bottom: 25px;
+        }
+
+        /* Center labels + full-width inputs */
+        .login-container label {
+            display: block;
+            font-weight: bold;
+            margin-bottom: 5px;
+            text-align: center;
+        }
+
+        .login-container input {
+            width: 90%;
+            padding: 12px;
+            margin-bottom: 20px;
+            border-radius: 5px;
+            border: 1px solid #aaa;
+            font-size: 16px;
+        }
+
+        /* Login button */
+        .login-container button {
+            width: 90%;
+            padding: 12px;
+            border: none;
+            border-radius: 5px;
+            border: 1px solid #333;
+            background-color: #8b0000;
+            color: white;
+            font-size: 16px;
+            cursor: pointer;
+            transition: background-color .2s ease;
+        }
+
+        .login-container button:hover {
+            background-color: #a30000;
+        }
+
+        /* Back to home button */
+        .back-button {
+            display: block;
+            width: 200px;
+            margin: 25px auto 0 auto;
+            padding: 10px;
+            text-align: center;
+            border: 1px solid #333;
+            border-radius: 5px;
+            background-color: #8b0000;
+            cursor: pointer;
+            transition: background-color .2s ease;
+        }
+
+        .back-button:hover {
+            background-color: #e0e0e0;
+        }
+
+        .error-message {
+            margin-top: 15px;
+            color: red;
+            text-align: center;
+        }
+    </style>
 </head>
+
 <body>
+
 <header>
-    <h1>Admin Login</h1>
+    <div style="display: flex; align-items: center;">
+        <img src="/images/cougar_mock-up.png" alt="WSU Logo">
+        <h1 onclick="window.location.href='/'">Voiland Food Pantry</h1>
+    </div>
 </header>
 
-<div class="main-content">
+<div class="login-container">
+    <h2>Admin Login</h2>
+
     <form th:action="@{/perform_login}" method="post">
-        <label>Username: <input type="text" name="username" required></label><br>
-        <label>Password: <input type="password" name="password" required></label><br>
+        <label>Username:</label>
+        <input type="text" name="username" required>
+
+        <label>Password:</label>
+        <input type="password" name="password" required>
+
         <button type="submit">Login</button>
     </form>
 
-    <!-- Optional: display login error -->
-    <div th:if="${param.error}" style="color:red;">
+    <div th:if="${param.error}" class="error-message">
         Invalid username or password
     </div>
 </div>
+
+<!-- Back to home button -->
+<div>
+    <button class="back-button" onclick="window.location.href='/'">Back to Home</button>
+</div>
+
 </body>
 </html>

@@ -86,15 +86,38 @@ public class VolunteerAuthController {
     // =========================
     // DASHBOARD
     // =========================
+    @Autowired
+    private com.voilandPantry.repositories.VolunteerHoursRepository hoursRepository; // Add this line at the top with other Autowired fields
+
     @GetMapping("/dashboard")
     public String dashboard(HttpSession session, Model model) {
+        Long volunteerId = (Long) session.getAttribute("volunteerId");
         String name = (String) session.getAttribute("volunteerName");
 
-        if (name == null) {
+        if (volunteerId == null) {
             return "redirect:/volunteer/login";
         }
 
-        model.addAttribute("name", name);
+        // 1. Find the volunteer object
+        Optional<Volunteer> volunteerOpt = volunteerRepository.findById(volunteerId);
+        
+        if (volunteerOpt.isPresent()) {
+            Volunteer v = volunteerOpt.get();
+            
+            // 2. Fetch the hours for this specific volunteer
+            java.util.List<com.voilandPantry.models.VolunteerHours> allHours = hoursRepository.findByVolunteer(v);
+
+            // 3. Calculate the total sum of hours
+            double total = allHours.stream()
+                                .mapToDouble(com.voilandPantry.models.VolunteerHours::getHours)
+                                .sum();
+
+            // 4. Send everything to the dashboard
+            model.addAttribute("name", name);
+            model.addAttribute("totalHours", total);
+            model.addAttribute("recentHours", allHours); 
+        }
+
         return "volunteer_dashboard";
     }
 

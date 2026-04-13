@@ -1,289 +1,300 @@
 <!DOCTYPE html>
 <html lang="en" xmlns:th="http://www.thymeleaf.org">
 <head>
-<meta charset="UTF-8">
-<title>Welcome</title>
-<link rel="stylesheet" href="/css/style.css">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Welcome - Voiland Food Pantry</title>
+    <link rel="stylesheet" href="/css/style.css">
 
-<!-- Ding sound -->
-<audio id="dingSound">
-    <source src="/sounds/ding.mp3" type="audio/mpeg">
-</audio>
+    <audio id="dingSound">
+        <source src="/sounds/ding.mp3" type="audio/mpeg">
+    </audio>
 
-<style>
-body {
-    font-family: Arial, Helvetica, sans-serif;
-    background: #f4f6f8;
-    margin: 0;
-}
+    <style>
+        :root {
+            --wsu-crimson: #8b0000;
+            --wsu-crimson-hover: #a30000;
+        }
 
-/* Back button */
-#backHomeBtn {
-    position: absolute;
-    top: 20px;
-    right: 20px;
-    padding: 10px 18px;
-    border: none;
-    border-radius: 6px;
-    background-color: #502c2c;
-    color: white;
-    cursor: pointer;
-}
-#backHomeBtn:hover { background:#3d1f1f; }
+        body {
+            font-family: "Arial", sans-serif;
+            background: #f4f6f8;
+            margin: 0;
+            color: #333;
+        }
 
-/* Card Layout — BIGGER */
-.content-wrapper {
-    max-width: 1100px;
-    width: 90%;
-    margin: 40px auto;
-    background: white;
-    padding: 50px;
-    border-radius: 12px;
-    box-shadow: 0 4px 16px rgba(0,0,0,0.12);
-}
+        /* --- HEADER AREA --- */
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px 30px;
+            background: white;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+        }
 
-h1 { text-align:center; }
-p { text-align:center; color:#555; font-size:17px; }
+        header img { height: 60px; }
 
-/* Scanned list */
-#scannedList {
-    border: 2px dashed #ccc;
-    padding: 25px;
-    min-height: 100px;
-    margin: 30px 0;
-    background: #fafafa;
-    border-radius: 8px;
-    font-size:16px;
-}
+        #backHomeBtn {
+            padding: 10px 18px;
+            border: 1px solid #333;
+            border-radius: 6px;
+            background-color: var(--wsu-crimson);
+            color: white;
+            cursor: pointer;
+            font-weight: bold;
+            transition: 0.2s;
+        }
+        #backHomeBtn:hover { background: var(--wsu-crimson-hover); }
 
-/* RED THEME BUTTONS */
-.primary-btn {
-    display:block;
-    margin: 0 auto;
-    padding:14px 30px;
-    font-size:16px;
-    background:#db3434;
-    color:white;
-    border:none;
-    border-radius:6px;
-    cursor:pointer;
-}
-.primary-btn:hover { background:#b92929; }
+        /* --- INSTRUCTION BANNER --- */
+        .instruction-banner {
+            background-color: #f0f4f8;
+            padding: 12px 20px;
+            margin: 20px auto;
+            border-left: 4px solid var(--wsu-crimson);
+            border-radius: 4px;
+            max-width: 1050px;
+            width: 90%;
+        }
 
-.done-btn {
-    padding:14px 45px;
-    font-size:18px;
-    background:#db3434;
-    color:white;
-    border:none;
-    border-radius:6px;
-    cursor:pointer;
-}
-.done-btn:hover { background:#b92929; }
+        /* --- CONTENT CARD --- */
+        .content-wrapper {
+            max-width: 1100px;
+            width: 90%;
+            margin: 20px auto 80px auto;
+            background: white;
+            padding: 50px;
+            border-radius: 12px;
+            box-shadow: 0 4px 16px rgba(0,0,0,0.1);
+            text-align: center;
+        }
 
-/* Submit section */
-.submit-visit-container {
-    margin-top:50px;
-    text-align:center;
-    border-top:1px solid #eee;
-    padding-top:35px;
-}
+        h1 { color: #333; font-size: 32px; margin-bottom: 10px; }
+        .subtitle { color: #666; font-size: 18px; margin-bottom: 30px; }
 
-/* Popup modal */
-#checkoutPopup {
-    display:none;
-    position:fixed;
-    left:50%;
-    top:50%;
-    transform:translate(-50%,-50%);
-    background:white;
-    padding:35px;
-    border-radius:12px;
-    box-shadow:0 0 25px rgba(0,0,0,0.4);
-    z-index:1000;
-    width:340px;
-}
+        /* --- SCANNED LIST --- */
+        #scannedList {
+            border: 2px dashed #ccc;
+            padding: 30px;
+            min-height: 120px;
+            margin: 30px 0;
+            background: #fafafa;
+            border-radius: 8px;
+            font-size: 18px;
+            text-align: left;
+        }
 
-/* Confirmation */
-.confirmation-box {
-    margin-top:15px;
-    padding:15px;
-    background:#eef9f1;
-    border:1px solid #27ae60;
-    display:none;
-    border-radius:6px;
-}
-</style>
+        /* --- BUTTONS --- */
+        .primary-btn {
+            padding: 15px 35px;
+            font-size: 16px;
+            background: var(--wsu-crimson);
+            color: white;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: 0.2s;
+        }
+        .primary-btn:hover { background: var(--wsu-crimson-hover); }
+
+        .submit-visit-container {
+            margin-top: 50px;
+            border-top: 1px solid #eee;
+            padding-top: 35px;
+        }
+
+        /* --- MODAL POPUP --- */
+        #checkoutPopup {
+            display: none;
+            position: fixed;
+            left: 50%;
+            top: 50%;
+            transform: translate(-50%, -50%);
+            background: white;
+            padding: 40px;
+            border-radius: 12px;
+            box-shadow: 0 0 40px rgba(0,0,0,0.3);
+            z-index: 1000;
+            width: 400px;
+            text-align: center;
+        }
+
+        #checkoutPopup h3 { margin-top: 0; color: var(--wsu-crimson); }
+
+        .popup-input {
+            font-size: 18px;
+            width: 90%;
+            padding: 12px;
+            margin: 15px 0;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+
+        .popup-actions {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            margin-top: 20px;
+        }
+
+        /* --- CONFIRMATION BOX --- */
+        .confirmation-box {
+            margin-top: 15px;
+            padding: 20px;
+            background: #eef9f1;
+            border: 1px solid #27ae60;
+            display: none;
+            border-radius: 8px;
+        }
+
+        .error-msg { color: #d9534f; font-weight: bold; margin-top: 10px; }
+    </style>
 </head>
 
 <body>
 
-<button id="backHomeBtn" onclick="window.location.href='/'">← Back to Home</button>
+<header>
+    <div style="display: flex; align-items: center; gap: 15px;">
+        <img src="/images/cougar_mock-up.png" alt="WSU Logo">
+        <h1 style="margin:0; font-size: 24px;">Voiland Food Pantry</h1>
+    </div>
+    <button id="backHomeBtn" onclick="window.location.href='/'">← Back to Home</button>
+</header>
 
-<section role="region" aria-label="Instructions" style="background-color: #f0f4f8; padding: 12px 20px; margin: 15px 20px; border-left: 4px solid #A60F2D; border-radius: 4px; max-width: 90%; margin-left: auto; margin-right: auto;">
-    <p style="margin: 0; font-size: 16px; color: #333;"><strong>How to check out items:</strong> Scan product codes below to add items to your visit, then click Submit Visit when done.</p>
-</section>
-
-<h1 th:if="${student}">
-    Welcome back!</span>!
-</h1>
-<h1 th:unless="${student}" th:text="${message}">Welcome</h1>
+<div class="instruction-banner">
+    <p style="margin: 0; font-size: 16px; color: #333;">
+        <strong>How to check out items:</strong> Scan product codes below to add items to your visit, then click <strong>Submit Visit</strong> when you are finished.
+    </p>
+</div>
 
 <div class="content-wrapper">
+    <h1 th:if="${student}">Welcome back!!</h1>
+    <h1 th:unless="${student}" th:text="${message}">Welcome</h1>
+    
+    <p class="subtitle">Add items to your visit by scanning or typing their product code below.</p>
 
-<p>Add items to your visit by scanning or typing their product code below.</p>
+    <div id="scannedList">
+        <p id="emptyMsg" style="color:#999; text-align: center;">No items scanned yet.</p>
+    </div>
 
-<div id="scannedList">
-    <p id="emptyMsg" style="color:#999;">No items scanned yet.</p>
+    <button type="button" onclick="openCheckoutPopup()" class="primary-btn">
+        + Scan/Type Item
+    </button>
+
+    <div class="submit-visit-container">
+        <form method="POST" action="/end-visit" id="endVisitForm">
+            <input type="hidden" name="items" id="finalItems">
+            <button type="submit" class="primary-btn" style="padding: 18px 60px; font-size: 20px;">Submit Visit</button>
+        </form>
+    </div>
 </div>
 
-<button type="button" onclick="openCheckoutPopup()" class="primary-btn">
-    + Scan/Type Item
-</button>
-
-<div class="submit-visit-container">
-<form method="POST" action="/end-visit" id="endVisitForm">
-    <input type="hidden" name="items" id="finalItems">
-    <button type="submit" class="done-btn">Submit Visit</button>
-</form>
-</div>
-
-</div>
-
-<!-- POPUP -->
 <div id="checkoutPopup">
+    <h3>Add Item</h3>
 
-<h3>Add Item</h3>
+    <div id="inputSection">
+        <label style="font-weight: bold;">Enter Product Code:</label>
+        <input type="text" id="productCode" class="popup-input" placeholder="Scan or type code...">
+        
+        <div class="popup-actions">
+            <button type="button" onclick="lookupItem()" class="primary-btn" style="padding: 10px 25px;">Add</button>
+            <button type="button" onclick="closeCheckoutPopup()" style="background:#eee; border:1px solid #ccc; padding:10px 20px; border-radius:5px; cursor:pointer;">Cancel</button>
+        </div>
+    </div>
 
-<div id="inputSection">
-<label>Product Code:</label><br>
+    <div id="confirmationSection" class="confirmation-box">
+        <p style="font-size: 18px;">Found: <br>
+            <span id="foundItemName" style="font-weight:bold; color:#27ae60; font-size: 22px;"></span>
+        </p>
+        <div class="popup-actions">
+            <button type="button" onclick="addItemToList()" class="primary-btn" style="background:#27ae60; padding: 10px 25px;">Confirm Add</button>
+            <button type="button" onclick="resetPopup()" style="background:transparent; border:none; color:#666; text-decoration:underline; cursor:pointer;">Try Again</button>
+        </div>
+    </div>
 
-<input type="text" id="productCode"
-       style="font-size:18px;width:95%;margin-top:5px;"
-       placeholder="Type here...">
-
-<br><br>
-
-<button type="button"
-    onclick="lookupItem()"
-    style="background:#db3434;color:white;border:none;
-           padding:10px 18px;border-radius:5px;cursor:pointer;">
-    Add
-</button>
-
-<button type="button"
-    onclick="closeCheckoutPopup()"
-    style="background:#eee;border:1px solid #ccc;
-           padding:10px 18px;margin-left:10px;">
-    Cancel
-</button>
-</div>
-
-<div id="confirmationSection" class="confirmation-box">
-<p>Found:
-    <span id="foundItemName"
-          style="font-weight:bold;color:#27ae60;"></span>
-</p>
-
-<button type="button"
-    onclick="addItemToList()"
-    style="background:#27ae60;color:white;border:none;
-           padding:10px 18px;border-radius:5px;cursor:pointer;">
-    Add
-</button>
-
-<button type="button"
-    onclick="resetPopup()"
-    style="background:transparent;border:none;color:#666;
-           text-decoration:underline;margin-left:10px;cursor:pointer;">
-    Cancel
-</button>
-</div>
-
-<p id="errorStatus" style="color:red;font-size:13px;margin-top:10px;"></p>
-
+    <p id="errorStatus" class="error-msg"></p>
 </div>
 
 <script>
-let currentPendingItem = null;
+    let currentPendingItem = null;
 
-function openCheckoutPopup(){
-    resetPopup();
-    document.getElementById('checkoutPopup').style.display='block';
-    document.getElementById('productCode').focus();
-}
-
-function closeCheckoutPopup(){
-    document.getElementById('checkoutPopup').style.display='none';
-}
-
-function resetPopup(){
-    document.getElementById('productCode').value='';
-    document.getElementById('errorStatus').textContent='';
-    document.getElementById('confirmationSection').style.display='none';
-    document.getElementById('inputSection').style.display='block';
-    currentPendingItem=null;
-}
-
-function lookupItem(){
-    const code=document.getElementById('productCode').value.trim();
-    if(!code) return;
-
-    fetch('/inventory/checkout',{
-        method:'POST',
-        headers:{'Content-Type':'application/json'},
-        body:JSON.stringify({code:code})
-    })
-    .then(async resp=>{
-        if(resp.ok){
-            const data=await resp.json();
-            showConfirmation(data);
-        } else {
-            document.getElementById('errorStatus')
-                .textContent='Invalid scan. Please try again.';
-        }
-    })
-    .catch(()=>{
-        document.getElementById('errorStatus')
-            .textContent='Error contacting inventory.';
-    });
-}
-
-function showConfirmation(data){
-    document.getElementById("dingSound").play().catch(()=>{});
-    currentPendingItem=data;
-    document.getElementById('foundItemName').textContent=data.productName;
-    document.getElementById('inputSection').style.display='none';
-    document.getElementById('confirmationSection').style.display='block';
-}
-
-function addItemToList(){
-    if(!currentPendingItem) return;
-
-    const emptyMsg=document.getElementById("emptyMsg");
-    if(emptyMsg) emptyMsg.remove();
-
-    const scannedList=document.getElementById("scannedList");
-    const itemEntry=document.createElement("div");
-    itemEntry.style.padding="5px 0";
-    itemEntry.innerHTML=`✅ ${currentPendingItem.productName}`;
-    scannedList.appendChild(itemEntry);
-
-    const finalItems=document.getElementById("finalItems");
-    finalItems.value = finalItems.value
-        ? finalItems.value + ", " + currentPendingItem.productName
-        : currentPendingItem.productName;
-
-    closeCheckoutPopup();
-}
-
-document.getElementById('productCode')
-.addEventListener('keydown',e=>{
-    if(e.key==='Enter'){
-        e.preventDefault();
-        lookupItem();
+    function openCheckoutPopup(){
+        resetPopup();
+        document.getElementById('checkoutPopup').style.display='block';
+        document.getElementById('productCode').focus();
     }
-});
+
+    function closeCheckoutPopup(){
+        document.getElementById('checkoutPopup').style.display='none';
+    }
+
+    function resetPopup(){
+        document.getElementById('productCode').value='';
+        document.getElementById('errorStatus').textContent='';
+        document.getElementById('confirmationSection').style.display='none';
+        document.getElementById('inputSection').style.display='block';
+        currentPendingItem=null;
+    }
+
+    function lookupItem(){
+        const code=document.getElementById('productCode').value.trim();
+        if(!code) return;
+
+        fetch('/inventory/checkout',{
+            method:'POST',
+            headers:{'Content-Type':'application/json'},
+            body:JSON.stringify({code:code})
+        })
+        .then(async resp=>{
+            if(resp.ok){
+                const data=await resp.json();
+                showConfirmation(data);
+            } else {
+                document.getElementById('errorStatus').textContent='Invalid code. Please try again.';
+            }
+        })
+        .catch(()=>{
+            document.getElementById('errorStatus').textContent='Error contacting inventory.';
+        });
+    }
+
+    function showConfirmation(data){
+        document.getElementById("dingSound").play().catch(()=>{});
+        currentPendingItem=data;
+        document.getElementById('foundItemName').textContent=data.productName;
+        document.getElementById('inputSection').style.display='none';
+        document.getElementById('confirmationSection').style.display='block';
+    }
+
+    function addItemToList(){
+        if(!currentPendingItem) return;
+
+        const emptyMsg=document.getElementById("emptyMsg");
+        if(emptyMsg) emptyMsg.remove();
+
+        const scannedList=document.getElementById("scannedList");
+        const itemEntry=document.createElement("div");
+        itemEntry.style.padding="8px 0";
+        itemEntry.style.borderBottom="1px solid #eee";
+        itemEntry.innerHTML=`<span style="color:#27ae60; font-weight:bold;">✔</span> ${currentPendingItem.productName}`;
+        scannedList.appendChild(itemEntry);
+
+        const finalItems=document.getElementById("finalItems");
+        finalItems.value = finalItems.value
+            ? finalItems.value + ", " + currentPendingItem.productName
+            : currentPendingItem.productName;
+
+        closeCheckoutPopup();
+    }
+
+    document.getElementById('productCode').addEventListener('keydown',e=>{
+        if(e.key==='Enter'){
+            e.preventDefault();
+            lookupItem();
+        }
+    });
 </script>
 
 </body>

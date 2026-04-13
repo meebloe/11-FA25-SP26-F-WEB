@@ -3,91 +3,167 @@
 
 body {
     font-family: 'Montserrat', sans-serif;
-    background-color: #FFFFFF;
-    color: #000000;
+    background-color: #f8f9fa; /* Light grey background looks better with white boxes */
+    color: #333;
     margin: 0;
     padding: 0;
-    text-align: center;
 }
 
-/* Header section shared across all pages */
+/* Header section - Clean & Compact */
 header {
     display: flex;
     align-items: center;
-    justify-content: space-between;
-    padding: 15px 40px;
-    border-bottom: 2px solid #ccc;
+    padding: 10px 30px;
+    background-color: #fff;
+    border-bottom: 2px solid #ddd;
 }
 
 header img {
-    height: 300px;
+    height: 80px; /* Reduced from 300px to fix the overlap */
+    margin-right: 20px;
 }
 
 header h1 {
-    font-size: 3.5em;
-    margin: 0 auto;
-    text-align: center;
-    flex-grow: 1;
+    font-size: 1.8em; /* Reduced from 3.5em */
+    margin: 0;
     cursor: pointer;
+    color: #333;
 }
 
-/* Footer */
-footer {
-    position: fixed;
-    bottom: 0;
-    width: 100%;
-    font-size: 0.8em;
-    color: #333;
-    background-color: #f4f4f4;
-    padding: 10px;
+/* Main Content Container */
+.main-content {
+    max-width: 1100px;
+    margin: 40px auto;
+    padding: 0 20px 120px 20px; /* Space at bottom for the instruction bar */
+    display: block; /* Changed from Flex/Height:70vh to allow table scrolling */
+}
+
+h2 {
     text-align: center;
-    border-top: 1px solid #ccc;
+    color: #8b0000;
+    margin-bottom: 30px;
+}
+
+/* Inventory Toolbar / Search Box */
+.inventory-toolbar form {
+    display: flex;
+    justify-content: center; /* This centers Search, Clear, and View All */
+    align-items: center;
+    gap: 15px; /* Spacing between the search input and buttons */
+    flex-wrap: wrap; /* Keeps it looking good on smaller screens */
+}
+
+/* Ensure the search input doesn't take over the whole line */
+.inventory-toolbar input[type="text"] {
+    width: auto;
+    min-width: 300px;
+    margin-top: 0;
+    margin-bottom: 10px;
+}
+
+/* Table Styling */
+table {
+    width: 100%;
+    border-collapse: collapse;
+    background: #fff;
+    border-radius: 10px;
+    overflow: hidden;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+}
+
+th {
+    background-color: #eee;
+    padding: 15px;
+    text-align: center;
+    border-bottom: 2px solid #ddd;
+}
+
+td {
+    padding: 12px;
+    text-align: center;
+    border-bottom: 1px solid #eee;
+}
+
+tr:hover {
+    background-color: #f9f9f9;
 }
 
 /* Buttons */
 button {
-    background-color: #A60F2D;
+    background-color: #8b0000; /* WSU Maroon */
     color: white;
     border: none;
-    padding: 15px 30px;
-    margin: 10px;
-    font-size: 1em;
+    padding: 10px 20px;
+    font-size: 14px;
+    font-weight: bold;
     cursor: pointer;
     border-radius: 5px;
-    transition: background-color 0.3s;
+    transition: background-color 0.2s;
+    margin-bottom: 10px;
+    margin-top: 5px;
 }
 
 button:hover {
-    background-color: #CA1237;
+    background-color: #a30000;
 }
 
-/* Centered content */
-.main-content {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    height: 70vh;
+.delete-btn {
+    background-color: #444;
 }
 
-/* Forms */
-form {
-    display: flex;
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 15px;
+.delete-btn:hover {
+    background-color: #555;
 }
 
-label {
-    display: inline-block;
-    width: 150px;
-    text-align: right;
-    margin-right: 10px;
+/* Popup/Modal Styling */
+[id*="Popup"] {
+    border-radius: 12px !important;
+    border: none !important;
+    padding: 30px !important;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.3) !important;
+    width: 350px;
+    text-align: center;
 }
 
-input[type="text"], input[type="email"], input[type="password"] {
-    padding: 8px;
-    width: 250px;
+input[type="text"], input[type="number"], input[type="password"] {
+    padding: 10px;
+    width: 100%;
+    box-sizing: border-box; /* Prevents inputs from overflowing */
     border: 1px solid #ccc;
-    border-radius: 4px;
+    border-radius: 5px;
+    margin-top: 5px;
+}
+
+/* Center the action buttons (Checkout/Scan In) and the Back button */
+.button-container {
+    display: flex;
+    justify-content: center;
+    gap: 30px;         
+    margin-top: 30px;   
+    margin-bottom: 20px; 
+}
+
+/* Make buttons larger and more readable */
+button {
+    background-color: #8b0000;
+    color: white;
+    border: none;
+    padding: 15px 25px; /* Increased padding for a "bigger" feel */
+    font-size: 16px;    /* Slightly larger text */
+    font-weight: bold;
+    cursor: pointer;
+    border-radius: 8px; /* Softer rounded corners */
+    transition: transform 0.1s, background-color 0.2s;
+}
+
+button:hover {
+    background-color: #a30000;
+    transform: scale(1.05); /* Subtle grow effect on hover */
+}
+
+/* Ensure specific wrapper for Back button is centered */
+.back-btn-wrapper {
+    display: flex;
+    justify-content: center;
+    margin-bottom: 50px; /* Space above the instruction footer */
 }

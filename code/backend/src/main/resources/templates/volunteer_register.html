@@ -1,139 +1,104 @@
 <!DOCTYPE html>
 <html lang="en" xmlns:th="http://www.thymeleaf.org">
 <head>
-<meta charset="UTF-8">
-<title>Volunteer Register - Voiland Food Pantry</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Volunteer Register - Voiland Food Pantry</title>
+    <link rel="stylesheet" href="/css/style.css">
 
-<link rel="stylesheet" href="/css/style.css">
+    <style>
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px 30px;
+        }
+        header img { height: 80px; }
+        header h1 { margin-left: 15px; cursor: pointer; }
 
-<style>
-body {
-    font-family: "Arial", sans-serif;
-    margin: 0;
-    background-color: #f5f6fa;
-    color: #333;
-}
+        .login-container {
+            max-width: 450px;
+            margin: 50px auto;
+            padding: 30px;
+            border: 1px solid #ccc;
+            border-radius: 10px;
+            background: #fafafa;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+            text-align: center;
+        }
 
-/* HEADER */
-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 15px 30px;
-    background-color: #fff;
-    box-shadow: 0 2px 4px rgba(0,0,0,0.05);
-}
+        .login-container h2 { margin-bottom: 25px; }
 
-header img { height: 60px; }
+        .login-container label {
+            display: block;
+            font-weight: bold;
+            margin-bottom: 5px;
+            text-align: center;
+        }
 
-header h1 {
-    margin-left: 15px;
-    cursor: pointer;
-    font-size: 24px;
-    color: #502c2c;
-}
+        .login-container input {
+            width: 90%;
+            padding: 12px;
+            margin-bottom: 20px;
+            border-radius: 5px;
+            border: 1px solid #aaa;
+            font-size: 16px;
+        }
 
-/* CENTER CONTAINER */
-.main-content {
-    max-width: 500px;
-    margin: 80px auto;
-    padding: 0 20px;
-}
+        .login-container button {
+            width: 90%;
+            padding: 12px;
+            border: 1px solid #333;
+            border-radius: 5px;
+            background-color: #8b0000;
+            color: white;
+            font-size: 16px;
+            cursor: pointer;
+            transition: background-color .2s ease;
+        }
 
-/* CARD */
-.register-card {
-    background: white;
-    padding: 40px;
-    border-radius: 10px;
-    box-shadow: 0 2px 6px rgba(0,0,0,0.05);
-    text-align: center;
-}
+        .login-container button:hover { background-color: #a30000; }
 
-.register-card h2 {
-    margin-bottom: 20px;
-    color: #502c2c;
-}
+        .login-link {
+            margin-top: 20px;
+            display: block;
+            color: #8b0000;
+            text-decoration: none;
+            font-weight: bold;
+        }
+        .login-link:hover { text-decoration: underline; }
 
-/* FORM */
-form {
-    display: flex;
-    flex-direction: column;
-    gap: 15px;
-}
-
-input {
-    padding: 12px;
-    border: 1px solid #ccc;
-    border-radius: 5px;
-    font-size: 15px;
-}
-
-/* BUTTON */
-button {
-    padding: 10px 20px;
-    background-color: #db3434;
-    color: white;
-    border: none;
-    border-radius: 5px;
-    cursor: pointer;
-    font-weight: bold;
-
-    width: auto;
-    align-self: center;
-}
-
-button:hover {
-    background-color: #b92929;
-}
-
-/* ERROR */
-.error {
-    color: red;
-    margin-top: 10px;
-}
-
-/* LINK */
-.login-link {
-    margin-top: 15px;
-    display: block;
-    color: #db3434;
-    text-decoration: none;
-    font-weight: bold;
-}
-
-.login-link:hover {
-    text-decoration: underline;
-}
-</style>
+        .error-message { margin-top: 15px; color: red; text-align: center; }
+    </style>
 </head>
-
 <body>
 
 <header>
-    <div style="display: flex; align-items: center; gap: 10px;">
-        <img src="/images/cougar_mock-up.png">
+    <div style="display: flex; align-items: center;">
+        <img src="/images/cougar_mock-up.png" alt="WSU Logo">
         <h1 onclick="window.location.href='/'">Voiland Food Pantry</h1>
     </div>
 </header>
 
-<div class="main-content">
-
-<div class="register-card">
+<div class="login-container">
     <h2>Register as Volunteer</h2>
 
     <form method="post" action="/volunteer/register">
-        <input type="text" name="name" placeholder="Full Name" required>
-        <input type="email" name="email" placeholder="Email" required>
-        <input type="password" name="password" placeholder="Password" required>
+        <label>Full Name:</label>
+        <input type="text" name="name" required>
+
+        <label>Email:</label>
+        <input type="email" name="email" required>
+
+        <label>Password:</label>
+        <input type="password" name="password" required>
 
         <button type="submit">Register</button>
     </form>
 
-    <p class="error" th:if="${error}" th:text="${error}"></p>
+    <p class="error-message" th:if="${error}" th:text="${error}"></p>
 
     <a href="/volunteer/login" class="login-link">Back to Login</a>
-</div>
-
 </div>
 
 </body>

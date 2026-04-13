@@ -1,201 +1,209 @@
 <!DOCTYPE html>
 <html lang="en" xmlns:th="http://www.thymeleaf.org">
 <head>
-<meta charset="UTF-8">
-<title>Manage Volunteers - Voiland Food Pantry</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Manage Volunteers - Voiland Food Pantry</title>
+    <link rel="stylesheet" href="/css/style.css">
 
-<link rel="stylesheet" href="/css/style.css">
+    <style>
+        /* Matches Manage Admin Header */
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px 30px;
+            background-color: #fff;
+        }
+        header img {
+            height: 80px;
+        }
+        header h1 {
+            margin-left: 15px;
+            cursor: pointer;
+            color: #333;
+        }
 
-<style>
-body {
-    font-family: "Arial", sans-serif;
-    margin: 0;
-    background-color: #f5f6fa;
-    color: #333;
-}
+        .container {
+            max-width: 900px;
+            margin: 60px auto;
+            padding: 0 20px;
+        }
 
-/* HEADER */
-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 15px 30px;
-    background-color: #fff;
-    box-shadow: 0 2px 4px rgba(0,0,0,0.05);
-}
+        .box {
+            background: #fafafa;
+            padding: 25px;
+            border-radius: 10px;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+            margin-bottom: 40px;
+        }
 
-.header-left {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-}
+        h2 {
+            text-align: center;
+            margin-bottom: 20px;
+        }
 
-header img { height: 60px; }
+        /* Matches Table Style */
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 15px;
+        }
+        th, td {
+            padding: 12px;
+            border-bottom: 1px solid #ddd;
+            text-align: center;
+        }
+        th {
+            background-color: #eee;
+            color: #333;
+        }
 
-header h1 {
-    font-size: 24px;
-    color: #502c2c;
-    cursor: pointer;
-}
+        /* Button Styling */
+        .action-btn {
+            padding: 8px 15px;
+            font-size: 0.9em;
+            border-radius: 5px;
+            border: none;
+            cursor: pointer;
+            background-color: #8b0000;
+            color: white;
+            transition: background-color .2s ease;
+        }
+        .action-btn:hover {
+            background-color: #a30000;
+        }
 
-/* MAIN */
-.main-content {
-    max-width: 1000px;
-    margin: 50px auto;
-    padding: 0 20px;
-}
+        .delete-btn {
+            background-color: #444;
+        }
+        .delete-btn:hover {
+            background-color: #555;
+        }
 
-h2 {
-    text-align: center;
-    color: #502c2c;
-    margin-bottom: 30px;
-}
+        .back-btn {
+            width: auto;
+            display: block;
+            margin: 20px auto;
+            padding: 12px 25px;
+            background-color: #8b0000;
+            color: white;
+            text-decoration: none;
+            border-radius: 5px;
+            text-align: center;
+            max-width: 200px;
+        }
 
-/* TABLE CARD */
-.table-card {
-    background: white;
-    padding: 25px;
-    border-radius: 10px;
-    box-shadow: 0 2px 6px rgba(0,0,0,0.05);
-}
+        /* Modal popup */
+        .modal-bg {
+            display: none;
+            position: fixed;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            background: rgba(0,0,0,0.5);
+            justify-content: center;
+            align-items: center;
+        }
+        .modal-box {
+            background: #fafafa;
+            padding: 25px;
+            border-radius: 10px;
+            width: 350px;
+            text-align: center;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+        }
+        .modal-box input {
+            width: 100%;
+            padding: 10px;
+            margin: 15px 0;
+            border-radius: 5px;
+            border: 1px solid #aaa;
+            box-sizing: border-box;
+        }
+        .modal-box button {
+            width: 100%;
+            margin-top: 10px;
+        }
+    </style>
 
-/* TABLE */
-table {
-    width: 100%;
-    border-collapse: collapse;
-}
+    <script>
+        function openResetModal(id, name) {
+            document.getElementById("reset-id").value = id;
+            document.getElementById("modal-volunteer-name").innerText = name;
+            document.getElementById("modal-bg").style.display = "flex";
+        }
 
-th {
-    background-color: #db3434;
-    color: white;
-    padding: 12px;
-    text-align: left;
-}
-
-td {
-    padding: 12px;
-    border-bottom: 1px solid #eee;
-}
-
-tr:hover {
-    background-color: #f9f9f9;
-}
-
-/* RESET FORM */
-.reset-form {
-    display: flex;
-    gap: 8px;
-    align-items: center;
-}
-
-.reset-form input {
-    padding: 6px;
-    border: 1px solid #ccc;
-    border-radius: 4px;
-}
-
-/* BUTTONS */
-button {
-    padding: 6px 10px;
-    border: none;
-    border-radius: 4px;
-    cursor: pointer;
-    font-weight: bold;
-}
-
-/* RESET BUTTON */
-.reset-btn {
-    background-color: #db3434;
-    color: white;
-}
-
-.reset-btn:hover {
-    background-color: #b92929;
-}
-
-/* DELETE BUTTON */
-.delete-btn {
-    background-color: #95a5a6;
-    color: white;
-}
-
-.delete-btn:hover {
-    background-color: #7f8c8d;
-}
-
-/* BACK LINK */
-.back-link {
-    margin-top: 20px;
-    display: block;
-    text-align: center;
-    color: #db3434;
-    text-decoration: none;
-    font-weight: bold;
-}
-
-.back-link:hover {
-    text-decoration: underline;
-}
-</style>
+        function closeModal() {
+            document.getElementById("modal-bg").style.display = "none";
+        }
+    </script>
 </head>
 
 <body>
 
 <header>
-    <div class="header-left">
-        <img src="/images/cougar_mock-up.png">
+    <div style="display: flex; align-items: center;">
+        <img src="/images/cougar_mock-up.png" alt="WSU Logo">
         <h1 onclick="window.location.href='/'">Voiland Food Pantry</h1>
     </div>
 </header>
 
-<div class="main-content">
+<div class="container">
 
-<h2>Manage Volunteers</h2>
+    <div class="box">
+        <h2>Manage Volunteers</h2>
 
-<div class="table-card">
+        <table>
+            <thead>
+                <tr>
+                    <th>Name</th>
+                    <th>Email</th>
+                    <th>Reset Password</th>
+                    <th>Delete</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr th:each="v : ${volunteers}">
+                    <td th:text="${v.name}"></td>
+                    <td th:text="${v.email}"></td>
+                    <td>
+                        <button class="action-btn"
+                                th:attr="onclick=|openResetModal('${v.id}', '${v.name}')|">
+                            Reset
+                        </button>
+                    </td>
+                    <td>
+                        <form method="post" action="/admin/volunteers/delete" style="margin:0;">
+                            <input type="hidden" name="id" th:value="${v.id}">
+                            <button type="submit" class="action-btn delete-btn"
+                                    onclick="return confirm('Delete this volunteer?')">
+                                Delete
+                            </button>
+                        </form>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
 
-<table>
-    <thead>
-        <tr>
-            <th>Name</th>
-            <th>Email</th>
-            <th>Reset Password</th>
-            <th>Delete</th>
-        </tr>
-    </thead>
-
-    <tbody>
-        <tr th:each="v : ${volunteers}">
-            <td th:text="${v.name}"></td>
-            <td th:text="${v.email}"></td>
-
-            <!-- RESET -->
-            <td>
-                <form method="post" action="/admin/volunteers/reset-password" class="reset-form">
-                    <input type="hidden" name="id" th:value="${v.id}">
-                    <input type="text" name="newPassword" placeholder="New Password" required>
-                    <button type="submit" class="reset-btn">Reset</button>
-                </form>
-            </td>
-
-            <!-- DELETE -->
-            <td>
-                <form method="post" action="/admin/volunteers/delete">
-                    <input type="hidden" name="id" th:value="${v.id}">
-                    <button type="submit" class="delete-btn"
-                        onclick="return confirm('Delete this volunteer?')">
-                        Delete
-                    </button>
-                </form>
-            </td>
-        </tr>
-    </tbody>
-</table>
+    <a href="/admin/dashboard" class="back-btn">Back to Dashboard</a>
 
 </div>
 
-<a href="/admin/dashboard" class="back-link">← Back to Dashboard</a>
+<div id="modal-bg" class="modal-bg">
+    <div class="modal-box">
+        <h3>Reset Password</h3>
+        <p>User: <span id="modal-volunteer-name" style="font-weight:bold;"></span></p>
 
+        <form action="/admin/volunteers/reset-password" method="post">
+            <input type="hidden" id="reset-id" name="id">
+            
+            <input type="password" name="newPassword" placeholder="Enter New Password" required>
+
+            <button type="submit" class="action-btn">Update Password</button>
+            <button type="button" onclick="closeModal()" class="action-btn delete-btn" style="margin-top:10px;">Cancel</button>
+        </form>
+    </div>
 </div>
 
 </body>
