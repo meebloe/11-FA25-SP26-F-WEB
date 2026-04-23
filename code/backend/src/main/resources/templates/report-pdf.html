@@ -57,20 +57,8 @@
 <table>
 <thead><tr><th>Major</th><th>Most Popular Item</th><th>Frequency</th></tr></thead>
 <tbody>
-<tr th:each="row : ${itemsByMajor}">
+<tr th:each="row : ${popularItemsByMajor}">
     <td th:text="${row[0]}"></td>
-    <td th:text="${row[1]}"></td>
-    <td th:text="${row[2]}"></td>
-</tr>
-</tbody>
-</table>
-
-<h3>Monthly Activity</h3>
-<table>
-<thead><tr><th>Month</th><th>Item</th><th>Count</th></tr></thead>
-<tbody>
-<tr th:each="row : ${itemsPerMonth}">
-    <td th:text="${T(java.time.Month).of(row[0]).name()}"></td>
     <td th:text="${row[1]}"></td>
     <td th:text="${row[2]}"></td>
 </tr>

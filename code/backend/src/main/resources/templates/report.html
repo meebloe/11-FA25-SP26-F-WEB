@@ -224,7 +224,7 @@
                 <tr><th>Major</th><th>Most Popular Item</th><th>Frequency</th></tr>
             </thead>
             <tbody>
-                <tr th:each="row : ${itemsByMajor}">
+                <tr th:each="row : ${popularItemsByMajor}">
                     <td th:text="${row[0]}"></td>
                     <td th:text="${row[1]}"></td>
                     <td th:text="${row[2]}"></td>

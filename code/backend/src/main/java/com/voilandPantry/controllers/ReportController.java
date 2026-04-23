@@ -66,6 +66,7 @@ public class ReportController {
         List<Visit> filteredVisits = filterVisitsByDateRange(startDate, endDate);
         List<Inventory> inventoryList = inventoryRepository.findAll();
 
+        // 1. Basic Stats
         int totalItems = inventoryList.stream().mapToInt(Inventory::getQuantity).sum();
         long lowStockCount = inventoryList.stream().filter(i -> i.getQuantity() <= 5).count();
 
@@ -75,15 +76,67 @@ public class ReportController {
         data.put("startDate", startDate);
         data.put("endDate", endDate);
 
+        // 2. Visits by Major
         Map<String, Long> visitsByMajorMap = filteredVisits.stream()
                 .filter(v -> v.getStudent() != null && v.getStudent().getMajor() != null)
                 .collect(Collectors.groupingBy(v -> v.getStudent().getMajor(), Collectors.counting()));
+        data.put("visitsByMajor", visitsByMajorMap.entrySet().stream()
+                .map(e -> new Object[]{e.getKey(), e.getValue()}).toList());
 
-        List<Object[]> visitsByMajor = visitsByMajorMap.entrySet().stream()
-                .map(e -> new Object[]{e.getKey(), e.getValue()})
+        // --- LOGIC FOR POPULAR ITEMS AND WEIGHT BY MAJOR ---
+        
+        // Create a lookup map for item weights using the CORRECT field name: netWeight
+        // We lowercase the keys to make matching easier
+        Map<String, Double> itemWeights = inventoryList.stream()
+                .collect(Collectors.toMap(
+                    item -> item.getProductName().toLowerCase().trim(), 
+                    Inventory::getNetWeight, 
+                    (v1, v2) -> v1
+                ));
+
+        Map<String, Map<String, Integer>> majorItemCounts = new HashMap<>(); 
+        Map<String, Double> majorWeights = new HashMap<>(); 
+
+        for (Visit visit : filteredVisits) {
+            if (visit.getStudent() == null || visit.getItems() == null || visit.getItems().isEmpty()) continue;
+
+            String major = visit.getStudent().getMajor();
+            // Split by comma and clean up whitespace
+            String[] items = visit.getItems().split(",");
+
+            for (String item : items) {
+                String rawName = item.trim();
+                if (rawName.isEmpty()) continue;
+                
+                String lowerName = rawName.toLowerCase();
+
+                // Track Item Counts per Major (keep original casing for display)
+                majorItemCounts.computeIfAbsent(major, k -> new HashMap<>())
+                        .merge(rawName, 1, Integer::sum);
+
+                // Track Weight per Major using the lookup map
+                Double weight = itemWeights.getOrDefault(lowerName, 0.0);
+                majorWeights.merge(major, weight, Double::sum);
+            }
+        }
+
+        // Convert Popular Items to List for Thymeleaf
+        List<Object[]> popularItemsByMajor = new ArrayList<>();
+        majorItemCounts.forEach((major, items) -> {
+            String topItem = items.entrySet().stream()
+                    .max(Map.Entry.comparingByValue())
+                    .map(Map.Entry::getKey).orElse("N/A");
+            Integer freq = items.getOrDefault(topItem, 0);
+            popularItemsByMajor.add(new Object[]{major, topItem, freq});
+        });
+
+        // Convert Weights to List for Thymeleaf
+        List<Object[]> weightByMajor = majorWeights.entrySet().stream()
+                .map(e -> new Object[]{e.getKey(), Math.round(e.getValue() * 100.0) / 100.0}) 
                 .toList();
 
-        data.put("visitsByMajor", visitsByMajor);
+        data.put("popularItemsByMajor", popularItemsByMajor);
+        data.put("weightByMajor", weightByMajor);
 
         return data;
     }

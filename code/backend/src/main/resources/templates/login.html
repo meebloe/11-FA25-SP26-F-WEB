@@ -9,20 +9,31 @@
 <body>
 <header>
     <img src="/images/cougar_mock-up.png" alt="Logo for WSU">
-    <h1 onclick="window.location.href='/'">Voiland Food Pantry</h1>
+    <h1 onclick="window.location.href='/'" style="cursor:pointer">Voiland Food Pantry</h1>
 </header>
 
 <div class="main-content">
-    <!-- Login Popup -->
     <div id="loginPopup" style="position: fixed; left: 50%; top: 50%; transform: translate(-50%, -50%); 
         background-color: white; padding: 40px; border: 1px solid #ccc; box-shadow: 0 0 10px rgba(0,0,0,0.5); 
         z-index: 1000; text-align: center; min-width: 400px; border-radius: 8px;">
         <h2>Student Sign-In</h2>
         <p style="font-size: 18px; color: #666; margin: 20px 0;">Please swipe your Cougar Card</p>
+        
         <form id="loginForm" method="POST" action="/login">
             <input type="text" id="identifier" name="identifier" autofocus style="opacity: 0; width: 0; height: 0; padding: 0; border: none; position: absolute;">
         </form>
+
+        <div style="margin-top: 20px; border-top: 1px solid #eee; padding-top: 20px;">
+            <p style="font-size: 14px; color: #888; margin-bottom: 10px;">Forgot your card or card not working?</p>
+            <button type="button" onclick="submitGuestLogin()" style="background-color: #f8f9fa; border: 1px solid #A60F2D; color: #A60F2D; padding: 10px 20px; border-radius: 4px; cursor: pointer; font-weight: bold;">
+                Sign In as Guest
+            </button>
+        </div>
     </div>
+
+    <form id="guestForm" method="POST" action="/login" style="display: none;">
+        <input type="hidden" id="guestIdentifier" name="identifier">
+    </form>
 
     <div class="back-btn-wrapper" style="position: fixed; bottom: 20px; left: 20px;">
         <button onclick="window.location.href='/'">Back to Home</button>
@@ -30,23 +41,24 @@
 </div>
 
 <section role="region" aria-label="Instructions" style="background-color: #f0f4f8; padding: 12px 20px; margin: 20px; border-left: 4px solid #A60F2D; border-radius: 4px; position: fixed; bottom: 80px; left: 0; right: 0; max-width: 500px; margin-left: auto; margin-right: auto;">
-    <p style="margin: 0; font-size: 16px; color: #333;"><strong>How to use:</strong> Swipe your Cougar Card to check in and begin your visit.</p>
+    <p style="margin: 0; font-size: 16px; color: #333;"><strong>How to use:</strong> Swipe your card to begin. If you don't have your card, use the Guest button.</p>
 </section>
 
 <script>
 let inputDebounceTimer;
 
+// Function to handle the Guest button click
+function submitGuestLogin() {
+    // Generates a unique ID like GUEST-1713812345678
+    const uniqueId = "GUEST-" + Date.now();
+    document.getElementById('guestIdentifier').value = uniqueId;
+    document.getElementById('guestForm').submit();
+}
+
 function handleLogin() {
     const identifier = document.getElementById('identifier').value.trim();
     if (!identifier) return;
-
-    // Debug statement
-    console.log('DEBUG: Identifier = ' + identifier);
-    
-    // Submit the form
     document.getElementById('loginForm').submit();
-
-        // Clear the input field for next swipe
     document.getElementById('identifier').value = '';
 }
 
@@ -54,6 +66,13 @@ document.addEventListener('DOMContentLoaded', () => {
     const input = document.getElementById('identifier');
     input.focus();
     
+    // Keep focus on the hidden input for card swipes unless the user is clicking the Guest button
+    document.addEventListener('click', (e) => {
+        if (e.target.tagName !== 'BUTTON') {
+            input.focus();
+        }
+    });
+
     input.addEventListener('keydown', e => {
         if (e.key === 'Enter') {
             e.preventDefault();
@@ -63,10 +82,7 @@ document.addEventListener('DOMContentLoaded', () => {
     });
     
     input.addEventListener('input', () => {
-        // Clear the previous debounce timer
         clearTimeout(inputDebounceTimer);
-        
-        // Set a new timer - submit only after 500ms of no input
         inputDebounceTimer = setTimeout(() => {
             if (input.value.trim().length > 0) {
                 handleLogin();
@@ -75,7 +91,5 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 });
 </script>
-
-<footer></footer>
 </body>
 </html>
