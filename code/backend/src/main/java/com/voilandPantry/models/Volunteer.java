@@ -1,6 +1,7 @@
 package com.voilandPantry.models;
 
 import jakarta.persistence.*;
+import java.util.List; // Add this import
 
 @Entity
 public class Volunteer {
@@ -17,6 +18,10 @@ public class Volunteer {
 
     @Column(nullable = false)
     private String name;
+
+    // ADD THIS SECTION:
+    @OneToMany(mappedBy = "volunteer", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<VolunteerHours> hours;
 
     public Volunteer() {}
 
@@ -36,4 +41,7 @@ public class Volunteer {
 
     public String getName() { return name; }
     public void setName(String name) { this.name = name; }
+    
+    public List<VolunteerHours> getHours() { return hours; }
+    public void setHours(List<VolunteerHours> hours) { this.hours = hours; }
 }

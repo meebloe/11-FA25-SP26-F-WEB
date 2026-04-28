@@ -14,6 +14,7 @@ public class VolunteerHours {
     private String date;
 
     @ManyToOne
+    @JoinColumn(name = "volunteer_id") // Ensures it matches the foreign key column
     private Volunteer volunteer;
 
     public VolunteerHours() {}

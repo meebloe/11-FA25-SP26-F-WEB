@@ -7,6 +7,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
@@ -54,8 +55,11 @@ public class AdminVolunteerController {
     // DELETE VOLUNTEER
     // =========================
     @PostMapping("/delete")
+    @Transactional // Ensures the cascade delete happens safely in one transaction
     public String deleteVolunteer(@RequestParam Long id) {
-        volunteerRepository.deleteById(id);
+        if (volunteerRepository.existsById(id)) {
+            volunteerRepository.deleteById(id);
+        }
         return "redirect:/admin/volunteers";
     }
 }

@@ -173,13 +173,13 @@
                         </button>
                     </td>
                     <td>
-                        <form method="post" action="/admin/volunteers/delete" style="margin:0;">
-                            <input type="hidden" name="id" th:value="${v.id}">
-                            <button type="submit" class="action-btn delete-btn"
-                                    onclick="return confirm('Delete this volunteer?')">
-                                Delete
-                            </button>
-                        </form>
+                    <form th:action="@{/admin/volunteers/delete}" method="post" style="margin:0;">
+                        <input type="hidden" name="id" th:value="${v.id}">
+                        <button type="submit" class="action-btn delete-btn"
+                                onclick="return confirm('Delete this volunteer?')">
+                            Delete
+                        </button>
+                    </form>
                     </td>
                 </tr>
             </tbody>
