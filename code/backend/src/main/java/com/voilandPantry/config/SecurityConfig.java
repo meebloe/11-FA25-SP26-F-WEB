@@ -46,7 +46,7 @@ public class SecurityConfig {
 
             .sessionManagement(session -> session
                 .sessionFixation().migrateSession()
-                .invalidSessionUrl("/admin-login")
+                .invalidSessionUrl("/")
                 .maximumSessions(1)
                 .maxSessionsPreventsLogin(false)
             )

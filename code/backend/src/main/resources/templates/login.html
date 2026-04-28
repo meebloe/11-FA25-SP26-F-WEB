@@ -62,6 +62,18 @@ function handleLogin() {
     document.getElementById('identifier').value = '';
 }
 
+function showGuestLogin() {
+    document.getElementById('loginPopup').style.display = 'none';
+    document.getElementById('guestLoginPopup').style.display = 'block';
+    document.getElementById('guestYear').focus();
+}
+
+function hideGuestLogin() {
+    document.getElementById('guestLoginPopup').style.display = 'none';
+    document.getElementById('loginPopup').style.display = 'block';
+    document.getElementById('identifier').focus();
+}
+
 document.addEventListener('DOMContentLoaded', () => {
     const input = document.getElementById('identifier');
     input.focus();
